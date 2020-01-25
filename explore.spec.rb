@@ -17,7 +17,7 @@ end
 require 'forwardable'
 
 
-class Setup
+class SetupSet
 
   def initialize(desc, details, block)
     @desc    = desc.to_sym
@@ -26,79 +26,125 @@ class Setup
   end
 
   def each(&block)
-    pp 'Setup.each', details: @details, block: @block
-    @details ? @details.each(&block) : block.call(@block.call)
+    #@details ? @details.each(&block) : block.call(@block)
+    @details ? @details.each(&block) : block.call(@block)
   end
+
+  #          setup_value = (setup.respond_to? :call) ? context.instance_eval(&setup) : setup
 end
 
-class Case
-  extend Forwardable
+class Assertion
 
   attr_accessor :desc
-  def_delegators :@tests, :each
+  attr_accessor :block
 
-  def initialize(desc, tests)
+  def initialize(desc, block)
     @desc  = desc.to_sym
-    @tests = [tests].flatten.map(&:to_sym)
+    @block = block
+  end
+
+  def exec_in_context(context, result, setup_value)
+    context.instance_exec(result, setup_value, &@block)
+  end
+
+end
+
+class EquivalenceClass
+  attr_accessor :setup_key
+  attr_accessor :asserts_keys
+  attr_accessor :setup
+  attr_accessor :action_block
+  attr_accessor :assertions
+
+  def initialize(setup_key, asserts_keys)
+    @setup_key    = setup_key.to_sym
+    @asserts_keys = [asserts_keys].flatten.map(&:to_sym)
   end
 
   def inspect
-    "Case #{@desc}: #{@tests}"
+    "EquivalenceClass #{@setup_key}: #{@asserts_keys}"
+  end
+
+  def each_test(&block)
+    @setup.each do |setup|
+      @assertions.each do |assertion|
+        block.call(setup, @action_block, assertion)
+      end
+    end
   end
 
 end
 
 class SuiteDSL
 
-  attr_reader :action_block, :assertions, :setups_hash
+  attr_reader :equivalence_classes, :action_block, :assertions, :setup_set_hash
 
   def initialize
-    @action      = nil
-    @setups_hash = {}
-    @assertions  = {}
+    @action         = nil
+    @setup_set_hash = {}
+    @assertions     = {}
   end
 
-  def action &block
+  def cases(hash)
+    @equivalence_classes = hash.keys.map { |k| EquivalenceClass.new(k, hash[k]) }
+  end
+
+  def setups(setup_key, details = nil, &block)
+    @setup_set_hash[setup_key.to_sym] = SetupSet.new(setup_key, details, block)
+  end
+
+  def action(&block)
     @action_block = block
   end
 
-  def asserts desc, &block
-    @assertions[desc.to_sym] = block
+  def asserts(desc, &block)
+    @assertions[desc.to_sym] = Assertion.new(desc, block)
   end
 
-  def setups desc, details = nil, &block
-    @setups_hash[desc.to_sym] = Setup.new(desc, details, block)
+  def verify_config!
+    @equivalence_classes.each do |ec|
+      s = @setup_set_hash[ec.setup_key]
+      raise "Set up not defined for `#{ec.setup_key}`. Defined: #{@setup_set_hash.keys}" unless s
+
+      ec.asserts_keys.each do |key|
+        raise "Asserts not defined for `#{ec.setup_key}`. Defined: #{@assertions.keys}" unless @assertions[key]
+      end
+    end
   end
 
+  def lock!
+    @equivalence_classes.each do |ec|
+      ec.setup        = @setup_set_hash[ec.setup_key]
+      ec.action_block = @action_block
+      ec.assertions   = ec.asserts_keys.map { |desc| @assertions[desc] }
+    end
+  end
+
+  def each_equivalence_class(&block)
+    @equivalence_classes.each { |kase| block.call(kase) }
+  end
 end
 
-def cases hash, &block
-  @cases = hash.keys.map { |k| Case.new(k, hash[k]) }
-
+def thoreau(&block)
   suite = SuiteDSL.new
   suite.instance_eval(&block)
+  suite.verify_config!
+  suite.lock!
 
-  @cases.each do |kase|
-    setups = suite.setups_hash[kase.desc]
-    raise "Set up not defined for `#{kase.desc}`. Defined: #{suite.setups_hash.keys}" unless setups
-
-    describe kase.desc do
-      pp setups: setups
-
-      setups.each do |setup|
-        kase.each do |test|
-          raise "Asserts not defined for `#{kase.desc}`. Defined: #{suite.assertions.keys}" unless suite.assertions[test]
-          specify "#{kase.desc}: given #{setup.inspect.truncate(30)} #{test}" do
-            context = Object.new
-            #pp setup: setup.is_a?(String) ? setup[0..10] : setup, responds: setup.respond_to?(:call)
-            setup_value = (setup.respond_to? :call) ? context.instance_eval(setup) : setup
-            result      = context.instance_eval { suite.action_block.call(setup_value) }
-            context.instance_eval { suite.assertions[test].call(result, setup_value) }
-          end
+  suite.each_equivalence_class do |ec|
+    describe ec.setup_key do
+      ec.each_test do |setup, action_block, assertion|
+        specify "#{ec.setup_key}: given #{setup.inspect.truncate(30)} #{assertion.desc}" do
+          context     = Object.new
+          setup_value = (setup.respond_to? :call) ? context.instance_eval(&setup) : setup
+          #setup_value = setup.call(context)
+          result      = context.instance_exec(setup_value, &action_block)
+          assertion.exec_in_context(context, result, setup_value)
         end
       end
     end
   end
+
 end
 
 
@@ -110,55 +156,64 @@ end
 
 #describe 'double()' do
 
-#cases any_integer_input: ['doubles the input'],
-#      nil_input:         :returns_nil,
-#      string_input:      :returns_nil do
-#
-#  action { |input| double(input) }
-#
-#  setups :any_integer_input, [0, -1, 1, 1 << 32, -(1 << 32)]
-#  setups :nil_input, nil
-#  setups :string_input, ['', 'foo', '*' * 10]
-#
-#  asserts 'doubles the input' do |actual, input|
-#    actual.must_be :==, (input << 1)
-#  end
-#
-#  asserts :returns_nil do |actual, input|
-#    actual.must_be :==, nil
-#  end
-#
-#end
+thoreau do
+  action { |input| double(input) }
+
+  cases 'any integer input': ['doubles the input'],
+        'nil input':         'returns nil',
+        'any string input':  'returns nil'
+
+  setups 'any integer input', [0, -1, 1, 1 << 32, -(1 << 32)]
+  setups 'nil input', nil
+  setups 'any string input', ['', 'foo', '*' * 10]
+
+  asserts 'doubles the input' do |actual, input|
+    actual.must_be :==, (input << 1)
+  end
+
+  asserts 'returns nil' do |actual|
+    actual.must_be :==, nil
+  end
+
+end
 #end
 
 describe 'dsl' do
 
-  cases a_constant_input: 'an output assertion' do
+  thoreau do
 
-    setups :a_constant_input, 'input'
+    cases 'a constant input' => [
+      'asserts receives input of action',
+      'asserts receives output of action'
+    ]
+
+    setups 'a constant input', 'input'
 
     action { |input| input + '1' }
 
-    asserts 'an output assertion' do |result|
+    asserts 'asserts receives input of action' do |_result, input|
+      input.must_be :==, 'input'
+    end
+
+    asserts 'asserts receives output of action' do |result|
       result.must_be :==, 'input1'
     end
   end
 
+  thoreau do
 
-  cases a_dynamic_context: [
-                             'context transferred from setup',
-                             'context transferred from action'
-                           ] do
+    cases 'dynamic contexts': [
+                                'context transferred from setup',
+                                'context transferred from action'
+                              ]
 
-    setups :a_dynamic_context do
+    setups 'dynamic contexts' do
       @a = 'a'
       @b = @a
     end
 
     action do
-      pp action: @b
       @b *= 2
-      pp action2: @b
     end
 
     asserts 'context transferred from setup' do
@@ -170,8 +225,9 @@ describe 'dsl' do
     end
   end
 
-  cases a_context: 'a single assertion',
-        an_input:  ['a single assertion', 'another assertion'] do
+  thoreau do
+    cases a_context: 'a single assertion',
+          an_input:  ['a single assertion', 'another assertion']
 
     setups :a_context do
       rand(2)
