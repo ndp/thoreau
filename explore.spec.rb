@@ -27,16 +27,16 @@ class SetupSet
     @block   = block
   end
 
-  def each(&block)
-    #@details ? @details.each(&block) : block.call(@block)
+  def each_setup(&block)
     @details ? @details.each(&block) : block.call(@block)
   end
 
   def each_setup_block(&block)
-
+    self.each_setup do |setup|
+      setup_block = Proc.new { |context| (setup.respond_to? :call) ? context.instance_eval(&setup) : setup }
+      block.call(setup_block)
+    end
   end
-
-  #          setup_value = (setup.respond_to? :call) ? context.instance_eval(&setup) : setup
 end
 
 # Represents a post-condition of a test.
@@ -48,7 +48,6 @@ end
 class Assertion
 
   attr_accessor :desc
-  attr_accessor :block
 
   def initialize(desc, block)
     @desc  = desc.to_sym
@@ -80,9 +79,8 @@ class EquivalenceClass
   end
 
   def each_test(&block)
-    @setup.each do |setup|
+    @setup.each_setup_block do |setup_block|
       @assertions.each do |assertion|
-        setup_block = Proc.new { |context| (setup.respond_to? :call) ? context.instance_eval(&setup) : setup }
         block.call(setup_block, @action_block, assertion)
       end
     end
@@ -95,9 +93,10 @@ class SuiteDSL
   attr_reader :equivalence_classes, :action_block, :assertions, :setup_set_hash
 
   def initialize
-    @action         = nil
-    @setup_set_hash = {}
-    @assertions     = {}
+    @action              = nil
+    @setup_set_hash      = {}
+    @assertions          = {}
+    @equivalence_classes = []
   end
 
   def cases(hash)
@@ -151,7 +150,8 @@ def thoreau(&block)
       ec.each_test do |setup_block, action_block, assertion|
         test_context = Object.new
         setup_value  = setup_block.call(test_context)
-        specify "#{ec.setup_key}: given #{setup_value.to_s.truncate(30)} #{assertion.desc}" do
+
+        specify "#{ec.setup_key} #{assertion.desc} when  #{setup_value.to_s.truncate(30)}" do
           result = test_context.instance_exec(setup_value, &action_block)
           assertion.exec_in_context(test_context, result, setup_value)
         end
