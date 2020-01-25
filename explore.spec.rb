@@ -123,7 +123,7 @@ class SuiteDSL
   def verify_config!
     @equivalence_classes.each do |ec|
       s = @setup_set_hash[ec.setup_key]
-      raise "Set up not defined for `#{ec.setup_key}`. Defined: #{@setup_set_hash.keys}" unless s
+      puts "# WARNING: Setup not defined for `#{ec.setup_key}` so null setup will be used. Defined: #{@setup_set_hash.keys}" unless s
 
       ec.asserts_keys.each do |key|
         raise "Asserts not defined for `#{ec.setup_key}`. Defined: #{@assertions.keys}" unless @assertions[key]
@@ -133,7 +133,7 @@ class SuiteDSL
 
   def lock!
     @equivalence_classes.each do |ec|
-      ec.setup        = @setup_set_hash[ec.setup_key]
+      ec.setup        = @setup_set_hash[ec.setup_key] || SetupSet.new('ec.setup_key', nil)
       ec.action_block = @action_block
       ec.assertions   = ec.asserts_keys.map { |desc| @assertions[desc] }
     end
@@ -202,21 +202,23 @@ describe SetupSet do
 
     cases 'single hard-coded value' => 'returns value',
           'hard-coded values'       => 'returns values',
-          'proc'                    => 'returns value',
+          'single proc'             => 'returns value',
+          'procs'                   => 'returns values',
           'generator'               => 'returns values',
           'nil'                     => 'returns nil'
 
     setup('single hard-coded value') { 1 }
     setup('hard-coded values') { [1, 2, 'three'] }
-    setup('proc') { -> (_) { 1 } }
+    setup('single proc') { -> (_) { 1 } }
+    setup('procs') { [-> (_) { 1 }, -> (_) { 2 }, -> (_) { 'three' }] }
     setup 'generator' do
-      o = Object.new
-      def o.each
-        yield(1)
-        yield(2)
-        yield('three')
+      Object.new.tap do |o|
+        def o.each
+          yield(1)
+          yield(2)
+          yield('three')
+        end
       end
-      o
     end
     setup 'nil', nil
 
@@ -334,6 +336,14 @@ describe 'dsl' do
 
     end
   end
+
+  # allows nil setup
+  # fails if no assertion
+  # complains if more than one setup with the same name
+  # complains if more than one action
+  # complains if more than one asserts with the same name
+  # warns about unused setups
+  # warns about unused asserts
 
 
 end
