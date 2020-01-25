@@ -17,21 +17,21 @@ end
 require 'forwardable'
 
 # Represents a set of inputs or different setups.
-# Setting "details" is a hard-code list of values.
+# Setting "values" is any enumerable.
 # Setting "block" will call the block to get the values.
 class SetupSet
 
-  def initialize(desc, details, block)
-    @desc    = desc.to_sym
-    @details = details
-    @block   = block
+  def initialize(desc, values, block)
+    @desc   = desc.to_sym
+    @values = values
+    @block  = block
   end
 
   def each_setup(&block)
-    if @details.respond_to?(:each)
-      @details.each(&block)
-    elsif @details
-      block.call(@details)
+    if @values.respond_to?(:each)
+      @values.each(&block)
+    elsif @values
+      block.call(@values)
     else
       block.call(@block)
     end
@@ -109,8 +109,8 @@ class SuiteDSL
     @equivalence_classes = hash.keys.map { |k| EquivalenceClass.new(k, hash[k]) }
   end
 
-  def setups(setup_key, details = nil, &block)
-    @setup_set_hash[setup_key.to_sym] = SetupSet.new(setup_key, details, block)
+  def setups(setup_key, values = nil, &block)
+    @setup_set_hash[setup_key.to_sym] = SetupSet.new(setup_key, values, block)
   end
 
   def action(&block)
@@ -201,47 +201,36 @@ end
 describe SetupSet do
 
   thoreau do
-    cases 'with single hard-coded value' => 'returns value',
-          'with hard-coded values'       => 'returns values',
-          'with proc'                    => 'returns value',
-          'with generator'               => 'returns values'
 
-    setups 'with single hard-coded value' do
-      SetupSet.new('desc', 1, nil)
-    end
+    cases 'single hard-coded value' => 'returns value',
+          'hard-coded values'       => 'returns values',
+          'proc'                    => 'returns value',
+          'generator'               => 'returns values'
 
-    setups 'with hard-coded values' do
-      SetupSet.new('desc', [1, 2, 'three'], nil)
-    end
-
-    setups 'with proc' do
-      SetupSet.new('desc', nil, -> (_) { 1 })
-    end
-
-    setups 'with generator' do
+    setups('single hard-coded value') { [1, nil] }
+    setups('hard-coded values') { [[1, 2, 'three'], nil] }
+    setups('proc') { [nil, -> (_) { 1 }] }
+    setups 'generator' do
       o = Object.new
+
       def o.each
         yield(1)
         yield(2)
         yield('three')
       end
 
-      SetupSet.new('desc', o, nil)
+      [o, nil]
     end
 
-    action do |subject|
-      result = []
-      subject.each_setup_block { |b| result << b.call }
-      result
+    action do |arg1, arg2|
+      subject = SetupSet.new('desc', arg1, arg2)
+      [].tap do |result|
+        subject.each_setup_block { |b| result << b.call }
+      end
     end
 
-    asserts 'returns value' do |result|
-      result.must_be :==, [1]
-    end
-
-    asserts 'returns values' do |result|
-      result.must_be :==, [1, 2, "three"]
-    end
+    asserts('returns value') { |result| result.must_be :==, [1] }
+    asserts('returns values') { |result| result.must_be :==, [1, 2, 'three'] }
 
   end
 end
