@@ -168,7 +168,6 @@ end
 #Use context for states
 # arrange - act - assert
 
-#describe 'double()' do
 
 thoreau do
   action { |input| double(input) }
@@ -179,7 +178,7 @@ thoreau do
 
   setups 'any integer input', [0, -1, 1, 1 << 32, -(1 << 32)]
   setups 'nil input', nil
-  setups 'any string input', ['', 'foo', '*' * 10]
+  setups 'any string input', ['', 'foo', '*' * 10000]
 
   asserts 'doubles the input' do |actual, input|
     actual.must_be :==, (input << 1)
@@ -190,38 +189,37 @@ thoreau do
   end
 
 end
-#end
 
 describe 'dsl' do
 
   thoreau do
 
     cases 'a constant input' => [
-      'asserts receives input of action',
-      'asserts receives output of action'
+      '`asserts` receives input of action',
+      '`asserts` receives output of action'
     ]
 
     setups 'a constant input', 'input'
 
     action { |input| input + '1' }
 
-    asserts 'asserts receives input of action' do |_result, input|
+    asserts '`asserts` receives input of action' do |_result, input|
       input.must_be :==, 'input'
     end
 
-    asserts 'asserts receives output of action' do |result|
+    asserts '`asserts` receives output of action' do |result|
       result.must_be :==, 'input1'
     end
   end
 
   thoreau do
 
-    cases 'dynamic contexts': [
-                                'context transferred from setup',
-                                'context transferred from action'
-                              ]
+    cases 'contexts shared': [
+                               'between `setups` and `assertion`',
+                               'between `action` and `assertion`'
+                             ]
 
-    setups 'dynamic contexts' do
+    setups 'contexts shared' do
       @a = 'a'
       @b = @a
     end
@@ -230,11 +228,11 @@ describe 'dsl' do
       @b *= 2
     end
 
-    asserts 'context transferred from setup' do
+    asserts 'between `setups` and `assertion`' do
       @a.must_be :==, 'a'
     end
 
-    asserts 'context transferred from action' do
+    asserts 'between `action` and `assertion`' do
       @b.must_be :==, 'aa'
     end
   end
