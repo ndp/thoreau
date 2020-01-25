@@ -206,22 +206,21 @@ describe SetupSet do
           'proc'                    => 'returns value',
           'generator'               => 'returns values'
 
-    prep('single hard-coded value') { [1, nil] }
-    prep('hard-coded values') { [[1, 2, 'three'], nil] }
-    prep('proc') { [nil, -> (_) { 1 }] }
+    prep('single hard-coded value') { 1 }
+    prep('hard-coded values') { [1, 2, 'three'] }
+    prep('proc') {  -> (_) { 1 } }
     prep 'generator' do
       o = Object.new
-
       def o.each
         yield(1)
         yield(2)
         yield('three')
       end
-
-      [o, nil]
+      o
     end
 
-    action do |arg1, arg2|
+    action do |input|
+      arg1, arg2 = input.respond_to?(:call) ? [nil, input] : [input, nil]
       subject = SetupSet.new('desc', arg1, arg2)
       [].tap do |result|
         subject.each_setup_block { |b| result << b.call }
