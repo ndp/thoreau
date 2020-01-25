@@ -23,12 +23,18 @@ class SetupSet
 
   def initialize(desc, details, block)
     @desc    = desc.to_sym
-    @details = details && [details].flatten
+    @details = details
     @block   = block
   end
 
   def each_setup(&block)
-    @details ? @details.each(&block) : block.call(@block)
+    if @details.respond_to?(:each)
+      @details.each(&block)
+    elsif @details
+      block.call(@details)
+    else
+      block.call(@block)
+    end
   end
 
   def each_setup_block(&block)
@@ -188,6 +194,56 @@ thoreau do
     actual.must_be :==, nil
   end
 
+end
+
+#require 'generator'
+
+describe SetupSet do
+
+  thoreau do
+    cases 'with single hard-coded value' => 'returns value',
+          'with hard-coded values'       => 'returns values',
+          'with proc'                    => 'returns value',
+          'with generator'               => 'returns values'
+
+    setups 'with single hard-coded value' do
+      SetupSet.new('desc', 1, nil)
+    end
+
+    setups 'with hard-coded values' do
+      SetupSet.new('desc', [1, 2, 'three'], nil)
+    end
+
+    setups 'with proc' do
+      SetupSet.new('desc', nil, -> (_) { 1 })
+    end
+
+    setups 'with generator' do
+      o = Object.new
+      def o.each
+        yield(1)
+        yield(2)
+        yield('three')
+      end
+
+      SetupSet.new('desc', o, nil)
+    end
+
+    action do |subject|
+      result = []
+      subject.each_setup_block { |b| result << b.call }
+      result
+    end
+
+    asserts 'returns value' do |result|
+      result.must_be :==, [1]
+    end
+
+    asserts 'returns values' do |result|
+      result.must_be :==, [1, 2, "three"]
+    end
+
+  end
 end
 
 describe 'dsl' do
