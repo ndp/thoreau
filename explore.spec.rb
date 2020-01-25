@@ -30,6 +30,10 @@ class SetupSet
     @details ? @details.each(&block) : block.call(@block)
   end
 
+  def each_setup_block(&block)
+
+  end
+
   #          setup_value = (setup.respond_to? :call) ? context.instance_eval(&setup) : setup
 end
 
@@ -68,7 +72,8 @@ class EquivalenceClass
   def each_test(&block)
     @setup.each do |setup|
       @assertions.each do |assertion|
-        block.call(setup, @action_block, assertion)
+        setup_block = Proc.new { |context| (setup.respond_to? :call) ? context.instance_eval(&setup) : setup }
+        block.call(setup_block, @action_block, assertion)
       end
     end
   end
@@ -133,13 +138,12 @@ def thoreau(&block)
 
   suite.each_equivalence_class do |ec|
     describe ec.setup_key do
-      ec.each_test do |setup, action_block, assertion|
-        specify "#{ec.setup_key}: given #{setup.inspect.truncate(30)} #{assertion.desc}" do
-          context     = Object.new
-          setup_value = (setup.respond_to? :call) ? context.instance_eval(&setup) : setup
-          #setup_value = setup.call(context)
-          result      = context.instance_exec(setup_value, &action_block)
-          assertion.exec_in_context(context, result, setup_value)
+      ec.each_test do |setup_block, action_block, assertion|
+        test_context = Object.new
+        setup_value  = setup_block.call(test_context)
+        specify "#{ec.setup_key}: given #{setup_value.to_s.truncate(30)} #{assertion.desc}" do
+          result = test_context.instance_exec(setup_value, &action_block)
+          assertion.exec_in_context(test_context, result, setup_value)
         end
       end
     end
