@@ -158,7 +158,7 @@ def thoreau(&block)
         setup_value  = setup_block.call(test_context)
 
         specify "#{ec.setup_key} #{assertion.desc} when  #{setup_value.to_s.truncate(30)}" do
-          result = test_context.instance_exec(setup_value, &action_block)
+          result = test_context.instance_exec(setup_value, &action_block) if action_block
           assertion.exec_in_context(test_context, result, setup_value)
         end
       end
