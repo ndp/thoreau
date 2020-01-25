@@ -16,7 +16,9 @@ end
 # DSL
 require 'forwardable'
 
-
+# Represents a set of inputs or different setups.
+# Setting "details" is a hard-code list of values.
+# Setting "block" will call the block to get the values.
 class SetupSet
 
   def initialize(desc, details, block)
@@ -37,6 +39,12 @@ class SetupSet
   #          setup_value = (setup.respond_to? :call) ? context.instance_eval(&setup) : setup
 end
 
+# Represents a post-condition of a test.
+# A test will be created for each assertion in the "one assertion per test" tradition.
+# The block is
+# * passed the result of the action as its first argument
+# * passed the setup value as the second argument
+# * will be executed in the same test context as the setup and action code
 class Assertion
 
   attr_accessor :desc
@@ -53,6 +61,8 @@ class Assertion
 
 end
 
+# Represents a group of tests with a set of one or more setups,
+# an `action_block`, and one or more assertions, or post-conditions.
 class EquivalenceClass
   attr_accessor :setup_key
   attr_accessor :asserts_keys
