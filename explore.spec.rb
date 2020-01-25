@@ -81,7 +81,7 @@ class EquivalenceClass
   end
 
   def inspect
-    "EquivalenceClass #{@setup_key}: #{@asserts_keys}"
+    "EquivalenceClass #{@setup_key} => #{@asserts_keys}"
   end
 
   def each_test(&block)
@@ -109,7 +109,7 @@ class SuiteDSL
     @equivalence_classes = hash.keys.map { |k| EquivalenceClass.new(k, hash[k]) }
   end
 
-  def setups(setup_key, values = nil, &block)
+  def prep(setup_key, values = nil, &block)
     @setup_set_hash[setup_key.to_sym] = SetupSet.new(setup_key, values, block)
   end
 
@@ -182,9 +182,9 @@ thoreau do
         'nil input':         'returns nil',
         'any string input':  'returns nil'
 
-  setups 'any integer input', [0, -1, 1, 1 << 32, -(1 << 32)]
-  setups 'nil input', nil
-  setups 'any string input', ['', 'foo', '*' * 10000]
+  prep 'any integer input', [0, -1, 1, 1 << 32, -(1 << 32)]
+  prep 'nil input', nil
+  prep 'any string input', ['', 'foo', '*' * 10000]
 
   asserts 'doubles the input' do |actual, input|
     actual.must_be :==, (input << 1)
@@ -196,7 +196,6 @@ thoreau do
 
 end
 
-#require 'generator'
 
 describe SetupSet do
 
@@ -207,10 +206,10 @@ describe SetupSet do
           'proc'                    => 'returns value',
           'generator'               => 'returns values'
 
-    setups('single hard-coded value') { [1, nil] }
-    setups('hard-coded values') { [[1, 2, 'three'], nil] }
-    setups('proc') { [nil, -> (_) { 1 }] }
-    setups 'generator' do
+    prep('single hard-coded value') { [1, nil] }
+    prep('hard-coded values') { [[1, 2, 'three'], nil] }
+    prep('proc') { [nil, -> (_) { 1 }] }
+    prep 'generator' do
       o = Object.new
 
       def o.each
@@ -244,7 +243,7 @@ describe 'Assertion' do
       'passes in `result` to block given'
     ]
 
-    setups '`exec_in_context`' do
+    prep '`exec_in_context`' do
       Assertion.new('desc', -> (result, setup_value) do
         @foo    = 'bar'
         @setup_value  = setup_value
@@ -278,7 +277,7 @@ describe 'dsl' do
       '`asserts` receives output of action'
     ]
 
-    setups 'a constant input', 'input'
+    prep 'a constant input', 'input'
 
     action { |input| input + '1' }
 
@@ -298,7 +297,7 @@ describe 'dsl' do
                                'between `action` and `assertion`'
                              ]
 
-    setups 'contexts shared' do
+    prep 'contexts shared' do
       @a = 'a'
       @b = @a
     end
@@ -320,11 +319,11 @@ describe 'dsl' do
     cases a_context: 'a single assertion',
           an_input:  ['a single assertion', 'another assertion']
 
-    setups :a_context do
+    prep :a_context do
       rand(2)
     end
 
-    setups :an_input, 'input'
+    prep :an_input, 'input'
 
     action { true }
 
