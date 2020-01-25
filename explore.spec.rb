@@ -17,23 +17,22 @@ end
 require 'forwardable'
 
 # Represents a set of inputs or different setups.
-# Setting "values" is any enumerable.
-# Setting "block" will call the block to get the values.
+# Setting "values" can be:
+# * an enumerable, yielding each value (dynamic is fine). This
+#   can be a hard-coded array, or a dynamic randomizing function.
+# * a single value
 class SetupSet
 
-  def initialize(desc, values, block)
+  def initialize(desc, values)
     @desc   = desc.to_sym
     @values = values
-    @block  = block
   end
 
   def each_setup(&block)
     if @values.respond_to?(:each)
       @values.each(&block)
-    elsif @values
-      block.call(@values)
     else
-      block.call(@block)
+      block.call(@values)
     end
   end
 
@@ -110,7 +109,7 @@ class SuiteDSL
   end
 
   def prep(setup_key, values = nil, &block)
-    @setup_set_hash[setup_key.to_sym] = SetupSet.new(setup_key, values, block)
+    @setup_set_hash[setup_key.to_sym] = SetupSet.new(setup_key, values || block)
   end
 
   def action(&block)
@@ -204,11 +203,12 @@ describe SetupSet do
     cases 'single hard-coded value' => 'returns value',
           'hard-coded values'       => 'returns values',
           'proc'                    => 'returns value',
-          'generator'               => 'returns values'
+          'generator'               => 'returns values',
+          'nil'                     => 'returns nil'
 
     prep('single hard-coded value') { 1 }
     prep('hard-coded values') { [1, 2, 'three'] }
-    prep('proc') {  -> (_) { 1 } }
+    prep('proc') { -> (_) { 1 } }
     prep 'generator' do
       o = Object.new
       def o.each
@@ -218,10 +218,10 @@ describe SetupSet do
       end
       o
     end
+    prep 'nil', nil
 
     action do |input|
-      arg1, arg2 = input.respond_to?(:call) ? [nil, input] : [input, nil]
-      subject = SetupSet.new('desc', arg1, arg2)
+      subject = SetupSet.new('desc', input)
       [].tap do |result|
         subject.each_setup_block { |b| result << b.call }
       end
@@ -229,6 +229,7 @@ describe SetupSet do
 
     asserts('returns value') { |result| result.must_be :==, [1] }
     asserts('returns values') { |result| result.must_be :==, [1, 2, 'three'] }
+    asserts('returns nil') { |result| result.must_be :==, [nil] }
 
   end
 end
@@ -244,9 +245,9 @@ describe 'Assertion' do
 
     prep '`exec_in_context`' do
       Assertion.new('desc', -> (result, setup_value) do
-        @foo    = 'bar'
-        @setup_value  = setup_value
-        @result = result
+        @foo         = 'bar'
+        @setup_value = setup_value
+        @result      = result
       end)
     end
 
