@@ -3,6 +3,7 @@ require 'minitest/autorun'
 require 'active_support'
 require 'active_support/core_ext/hash'
 require_relative 'lib/thoreau'
+require 'minitest/pride'
 
 def concat(a, b)
   a + b
@@ -24,12 +25,22 @@ def thoreau(&block)
   dsl_context.each_equivalence_class do |ec|
     describe ec.setup_key do
       ec.each_test do |setup_block, action_block, assertion|
-        test_context = Object.new
-        setup_value  = setup_block.call(test_context)
+        temp_context = Object.new
+        setup_value  = setup_block.call(temp_context)
 
         specify "#{ec.setup_key} #{assertion.desc} when  #{setup_value.to_s.truncate(30)}" do
-          result = test_context.instance_exec(setup_value, &action_block) if action_block
-          assertion.exec_in_context(test_context, result, setup_value)
+
+          # Transfer any variables set in the `setup` into the
+          # actual test context
+          temp_context.instance_variables.each do |iv|
+            self.instance_variable_set(iv, temp_context.instance_variable_get(iv))
+          end
+
+          # Action
+          result = self.instance_exec(setup_value, &action_block) if action_block
+
+          # Assertion
+          assertion.exec_in_context(self, result, setup_value)
         end
       end
     end
@@ -57,11 +68,11 @@ thoreau do
   setup 'any string input', ['', 'foo', '*' * 10000]
 
   asserts 'doubles the input' do |actual, input|
-    actual.must_be :==, (input << 1)
+    _(actual).must_be :==, (input << 1)
   end
 
   asserts 'returns nil' do |actual|
-    actual.must_be :==, nil
+    _(actual).must_be :==, nil
   end
 
 end
@@ -100,9 +111,9 @@ describe Thoreau::SetupSet do
       end
     end
 
-    asserts('returns value') { |result| result.must_be :==, [1] }
-    asserts('returns values') { |result| result.must_be :==, [1, 2, 'three'] }
-    asserts('returns nil') { |result| result.must_be :==, [nil] }
+    asserts('returns value') { |result| _(result).must_be :==, [1] }
+    asserts('returns values') { |result| _(result).must_be :==, [1, 2, 'three'] }
+    asserts('returns nil') { |result| _(result).must_be :==, [nil] }
 
   end
 end
@@ -130,13 +141,13 @@ describe Thoreau::Assertion do
     end
 
     asserts 'calls block given in context' do
-      @context.instance_variable_get(:@foo).must_be :==, 'bar'
+      _(@context.instance_variable_get(:@foo)).must_be :==, 'bar'
     end
     asserts 'passes in `setup_value` to block given' do
-      @context.instance_variable_get(:@setup_value).must_be :==, 'setup value'
+      _(@context.instance_variable_get(:@setup_value)).must_be :==, 'setup value'
     end
     asserts 'passes in `result` to block given' do
-      @context.instance_variable_get(:@result).must_be :==, 'result'
+      _(@context.instance_variable_get(:@result)).must_be :==, 'result'
     end
   end
 end
@@ -155,11 +166,11 @@ describe 'dsl' do
     action { |input| input + '1' }
 
     asserts '`asserts` receives input of action' do |_result, input|
-      input.must_be :==, 'input'
+      _(input).must_be :==, 'input'
     end
 
     asserts '`asserts` receives output of action' do |result|
-      result.must_be :==, 'input1'
+      _(result).must_be :==, 'input1'
     end
   end
 
@@ -180,11 +191,11 @@ describe 'dsl' do
     end
 
     asserts 'between `setups` and `assertion`' do
-      @a.must_be :==, 'a'
+      _(@a).must_be :==, 'a'
     end
 
     asserts 'between `action` and `assertion`' do
-      @b.must_be :==, 'aa'
+      _(@b).must_be :==, 'aa'
     end
   end
 
