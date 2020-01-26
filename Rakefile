@@ -11,6 +11,7 @@ Rake::TestTask.new(:minitest) do |t|
   t.test_files = FileList["minitest/**/*_test.rb"]
 end
 
+desc 'Run RSpec and MiniTest'
 task(:test => [:rspec, :minitest])
 
 task :default => :test
