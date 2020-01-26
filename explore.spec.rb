@@ -2,7 +2,7 @@ require 'minitest/spec'
 require 'minitest/autorun'
 require 'active_support'
 require 'active_support/core_ext/hash'
-require_relative 'src/thoreau'
+require_relative 'lib/thoreau'
 
 def concat(a, b)
   a + b
