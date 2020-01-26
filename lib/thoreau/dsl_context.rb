@@ -16,7 +16,7 @@ module Thoreau
     end
 
     def setup(setup_key, values = nil, &block)
-      @setup_set_hash[setup_key.to_sym] = SetupSet.new(setup_key, values || block)
+      @setup_set_hash[setup_key.to_sym] = SetupAssembly.new(setup_key, values || block)
     end
 
     def action(&block)
@@ -40,7 +40,7 @@ module Thoreau
 
     def lock!
       @equivalence_classes.each do |ec|
-        ec.setup        = @setup_set_hash[ec.setup_key] || SetupSet.new('ec.setup_key', nil)
+        ec.setup        = @setup_set_hash[ec.setup_key] || SetupAssembly.new('ec.setup_key', nil)
         ec.action_block = @action_block
         ec.assertions   = ec.asserts_keys.map { |desc| @assertions[desc] }
       end

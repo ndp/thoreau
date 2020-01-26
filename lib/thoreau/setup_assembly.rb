@@ -4,7 +4,7 @@
 #   can be a hard-coded array, or a dynamic randomizing function.
 # * a single value
 module Thoreau
-  class SetupSet
+  class SetupAssembly
 
     def initialize(desc, values)
       @desc   = desc.to_sym

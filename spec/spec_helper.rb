@@ -1,5 +1,5 @@
 require "bundler/setup"
-require "thoreau"
+require "thoreau/rspec"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
