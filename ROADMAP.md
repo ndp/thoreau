@@ -1,4 +1,5 @@
 # DSL Improvements
+* [ ] remove rspec generate!
 * [ ] allows nil setup
 * [ ] fails if no assertion
 * [ ] complains if more than one setup with the same name
