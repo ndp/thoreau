@@ -1,38 +1,45 @@
 RSpec.describe Thoreau::SetupAssembly do
 
-  cases 'single hard-coded value' => 'returns value',
-        'hard-coded values'       => 'returns values',
-        'single proc'             => 'returns value',
-        'procs'                   => 'returns values',
-        'generator'               => 'returns values',
-        'nil'                     => 'returns nil'
+  describe '#each_setup_block' do
 
-  setup('single hard-coded value') { 1 }
-  setup('hard-coded values') { [1, 2, 'three'] }
-  setup('single proc') { -> (_) { 1 } }
-  setup('procs') { [-> (_) { 1 }, -> (_) { 2 }, -> (_) { 'three' }] }
-  setup 'generator' do
-    Object.new.tap do |o|
-      def o.each
-        yield(1)
-        yield(2)
-        yield('three')
+    cases 'when `value` is a hard-coded value'              => 'returns single value',
+          'when `value` is a proc'                          => 'returns single value',
+          'when `value` is block returning a value'         => 'returns single value',
+          'when `value` is block returning multiple values' => 'returns multiple values',
+          'when `value` is procs'                           => 'returns multiple values',
+          'when `value` is an iterator'                     => 'returns multiple values',
+          'when `value` is nil'                             => 'returns nil'
+
+    setup('when `value` is a hard-coded value', 1)
+    setup('when `value` is block returning a value') { 1 }
+    setup('when `value` is block returning multiple values') { [1, 2, 'three'] }
+    setup('when `value` is a proc') { -> (_) { 1 } }
+    setup('when `value` is procs') { [-> (_) { 1 }, -> (_) { 2 }, -> (_) { 'three' }] }
+    setup 'when `value` is an iterator' do
+      Object.new.tap do |o|
+        def o.each
+          yield(1)
+          yield(2)
+          yield('three')
+        end
       end
     end
-  end
-  setup 'nil', nil
+    setup 'when `value` is nil', nil
 
-  action do |input|
-    subject = Thoreau::SetupAssembly.new('desc', input)
-    [].tap do |result|
-      subject.each_setup_block { |b| result << b.call }
+    action do |input|
+      subject = Thoreau::SetupAssembly.new('desc', input)
+
+      # Collect and return the values yielded by #each_setup_block
+      [].tap do |result|
+        subject.each_setup_block { |b| result << b.call }
+      end
     end
+
+    asserts('returns single value') { |result| expect(result).to eq [1] }
+    asserts('returns multiple values') { |result| expect(result).to eq [1, 2, 'three'] }
+    asserts('returns nil') { |result| expect(result).to eq [nil] }
+
+    generate!
+
   end
-
-  asserts('returns value') { |result| expect(result).to eq [1] }
-  asserts('returns values') { |result| expect(result).to eq [1, 2, 'three'] }
-  asserts('returns nil') { |result| expect(result).to eq [nil] }
-
-  generate!
-
 end
