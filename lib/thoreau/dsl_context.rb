@@ -24,7 +24,7 @@ module Thoreau
     end
 
     def asserts(desc, &block)
-      @assertions[desc.to_sym] = Assertion.new(desc, block)
+      @assertions[desc.to_sym] = AssertionBlock.new(desc, block)
     end
 
     def verify_config!

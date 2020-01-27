@@ -7,17 +7,17 @@
 
 module Thoreau
 
-  class Assertion
+  class AssertionBlock
 
     attr_accessor :desc
 
     def initialize(desc, block)
-      @desc  = desc.to_sym
+      @desc  = desc.to_s
       @block = block
     end
 
-    def exec_in_context(context, result, setup_value)
-      context.instance_exec(result, setup_value, &@block)
+    def exec_in_context(context, action_result, setup_value)
+      context.instance_exec(action_result, setup_value, &@block)
     end
 
   end

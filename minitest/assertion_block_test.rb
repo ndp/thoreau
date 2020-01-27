@@ -1,33 +1,35 @@
 require_relative './test_helper'
 
-describe Thoreau::Assertion do
+describe Thoreau::AssertionBlock do
   thoreau do
 
     cases '`exec_in_context`' => [
-      'calls block given in context',
+      'context variables are available in block',
       'passes in `setup_value` to block given',
       'passes in `result` to block given'
     ]
 
     setup '`exec_in_context`' do
-      Thoreau::Assertion.new('desc', -> (result, setup_value) do
-        @foo         = 'bar'
-        @setup_value = setup_value
-        @result      = result
+      Thoreau::AssertionBlock.new('desc', -> (action_result, setup_value_result) do
+        @setup_value = setup_value_result
+        @result      = action_result
       end)
     end
 
     action do |subject|
       @context = Object.new
+      @context.instance_variable_set(:@foo, 'bar')
       subject.exec_in_context(@context, 'result', 'setup value')
     end
 
-    asserts 'calls block given in context' do
+    asserts 'context variables are available in block' do
       _(@context.instance_variable_get(:@foo)).must_be :==, 'bar'
     end
+
     asserts 'passes in `setup_value` to block given' do
       _(@context.instance_variable_get(:@setup_value)).must_be :==, 'setup value'
     end
+
     asserts 'passes in `result` to block given' do
       _(@context.instance_variable_get(:@result)).must_be :==, 'result'
     end

@@ -7,3 +7,4 @@
 * [ ] complains if more than one asserts with the same name
 * [ ] warns about unused setups
 * [ ] warns about unused asserts
+* [ ] create [minitest plugin?](https://github.com/fteem/how-to-write-minitest-extensions/blob/master/manuscript/4-writing-our-first-extension.md#adding-the-plugin) 
