@@ -9,11 +9,17 @@ module Thoreau
 
   class AssertionBlock
 
-    attr_accessor :desc
-
     def initialize(desc, block)
-      @desc  = desc.to_s
+      @desc  = desc
       @block = block
+    end
+
+    def key
+      @desc.to_sym
+    end
+
+    def description
+      @desc.to_s
     end
 
     def exec_in_context(context, action_result, setup_value)

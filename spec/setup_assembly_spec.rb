@@ -1,5 +1,26 @@
 RSpec.describe Thoreau::SetupAssembly do
 
+  describe 'identifiers' do
+
+    cases 'described with string' => ['`key` is symbol', '`description` is string'],
+          'described with symbol' => ['`key` is symbol', '`description` is string']
+
+    setup("described with string") { 'description' }
+    setup("described with symbol") { :description }
+
+    action { |input| Thoreau::SetupAssembly.new(input, 1) }
+
+    asserts "`key` is symbol" do |subject|
+      expect(subject.key).to eq(:description)
+    end
+
+    asserts "`description` is string" do |subject|
+      expect(subject.description).to eq('description')
+    end
+
+    generate!
+  end
+
   describe '#each_setup_block' do
 
     cases 'when `value` is a hard-coded value'              => 'returns single value',

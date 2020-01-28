@@ -7,8 +7,16 @@ module Thoreau
   class SetupAssembly
 
     def initialize(desc, values, &block)
-      @desc   = desc.to_sym
+      @desc   = desc
       @values = block || values
+    end
+
+    def description
+      @desc.to_s
+    end
+
+    def key
+      @desc.to_sym
     end
 
     def each_setup(&block)

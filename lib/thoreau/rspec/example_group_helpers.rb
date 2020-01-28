@@ -19,7 +19,6 @@ module Thoreau
 
       def generate!
         thoreau_context.verify_config!
-        thoreau_context.lock!
 
         thoreau_context.each_equivalence_class do |ec|
           describe ec.setup_key do
@@ -27,7 +26,7 @@ module Thoreau
               temp_context = Object.new
               setup_value  = setup_block.call(temp_context)
 
-              it "#{assertion.desc} when given #{(setup_value || 'nil').to_s.truncate(30)}" do
+              it "#{assertion.description} when given #{(setup_value || 'nil').to_s.truncate(30)}" do
 
                 # Transfer any variables set in the `setup` into the
                 # actual test context

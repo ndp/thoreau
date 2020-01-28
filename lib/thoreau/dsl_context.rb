@@ -6,17 +6,19 @@ module Thoreau
 
     def initialize
       @action              = nil
-      @setup_set_hash      = {}
-      @assertions          = {}
+      @setup_assemblies    = []
+      @assertions          = []
       @equivalence_classes = []
     end
 
     def cases(hash)
-      @equivalence_classes = hash.keys.map { |k| EquivalenceClass.new(k, hash[k]) }
+      @equivalence_classes = hash.keys.map do |k|
+        EquivalenceClass.new(k, hash[k])
+      end
     end
 
-    def setup(setup_key, values = nil, &block)
-      @setup_set_hash[setup_key.to_sym] = SetupAssembly.new(setup_key, values || block)
+    def setup(desc, values = nil, &block)
+      @setup_assemblies << SetupAssembly.new(desc, values || block)
     end
 
     def action(&block)
@@ -24,25 +26,13 @@ module Thoreau
     end
 
     def asserts(desc, &block)
-      @assertions[desc.to_sym] = AssertionBlock.new(desc, block)
+      @assertions << AssertionBlock.new(desc, block)
     end
 
     def verify_config!
       @equivalence_classes.each do |ec|
-        s = @setup_set_hash[ec.setup_key]
-        puts "# WARNING: Setup not defined for `#{ec.setup_key}` so null setup will be used. Defined: #{@setup_set_hash.keys}" unless s
-
-        ec.asserts_keys.each do |key|
-          raise "Asserts not defined for `#{ec.setup_key}`. Defined: #{@assertions.keys}" unless @assertions[key]
-        end
-      end
-    end
-
-    def lock!
-      @equivalence_classes.each do |ec|
-        ec.setup        = @setup_set_hash[ec.setup_key] || SetupAssembly.new('ec.setup_key', nil)
         ec.action_block = @action_block
-        ec.assertions   = ec.asserts_keys.map { |desc| @assertions[desc] }
+        ec.verify_config!(@setup_assemblies, @assertions)
       end
     end
 
