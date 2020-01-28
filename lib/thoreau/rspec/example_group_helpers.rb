@@ -25,8 +25,11 @@ module Thoreau
             ec.each_test do |setup_block, action_block, assertion|
               temp_context = Object.new
               setup_value  = setup_block.call(temp_context)
+              setup_value_str = (setup_value || 'nil').to_s.truncate(30)
+              description     = assertion.description
+              description.concat " when given #{setup_value_str}" unless setup_value_str.match?(/^\[?#</) || description.include?(setup_value_str)
 
-              it "#{assertion.description} when given #{(setup_value || 'nil').to_s.truncate(30)}" do
+              it description do
 
                 # Transfer any variables set in the `setup` into the
                 # actual test context
@@ -35,7 +38,7 @@ module Thoreau
                 end
 
                 # Action
-                result = self.instance_exec(setup_value, &action_block) if action_block
+                result = action_block ? self.instance_exec(setup_value, &action_block) : setup_value
 
                 # Assertion
                 assertion.exec_in_context(self, result, setup_value)

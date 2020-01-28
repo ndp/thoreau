@@ -21,30 +21,33 @@ module Thoreau
 
     def verify_config!(setup_assemblies, assertions)
 
+      warnings = ''
+
       setup_assemblies.each do |setup|
         @setup = setup if @setup_key == setup.key
       end
       if @setup.nil?
-        available_keys = setup_assemblies.map(&:key)
-        puts "# WARNING: Setup not defined for `#{@setup_key}` so null setup will be used. Consider adding:"
-        puts "    setup \"#{@setup_key.to_s}\" do"
-        puts "    end"
-        puts "# Available: #{available_keys}" unless available_keys.empty?
+        available_keys = setup_assemblies.map(&:description).map { |x| "`#{x}`" }.to_sentence
+        warnings << "# WARNING: Setup not defined for `#{@setup_key}` so null setup will be used. Consider adding:\n"
+        warnings << "    setup \"#{@setup_key.to_s}\" do\n"
+        warnings << "    end\n"
+        warnings << "# Available: #{available_keys}\n" unless available_keys.empty?
         @setup = SetupAssembly.new('ec.setup_key', nil)
       end
 
-      available_keys = assertions.map(&:key)
+      available_keys = assertions.map(&:description).map { |x| "`#{x}`" }.to_sentence
       @asserts_keys.each do |key|
         assertion = assertions.find { |a| a.key == key }
         if assertion
           @assertions << assertion
         else
-          puts "# WARNING: Assertion not defined for `#{key}` so no test will be generated. Consider adding:"
-          puts "    asserts \"#{key.to_s}\" do | result |"
-          puts "    end"
-          puts "# Available: #{available_keys}" unless available_keys.empty?
+          warnings << "# WARNING: Assertion not defined for `#{key}` so no test will be generated. Consider adding:\n"
+          warnings << "    asserts \"#{key.to_s}\" do | result |\n"
+          warnings << "    end\n"
+          warnings << "# Available: #{available_keys}\n" unless available_keys.empty?
         end
       end
+      warnings.size > 0 ? warnings : nil
     end
 
     def each_test(&block)

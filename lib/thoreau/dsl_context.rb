@@ -32,7 +32,8 @@ module Thoreau
     def verify_config!
       @equivalence_classes.each do |ec|
         ec.action_block = @action_block
-        ec.verify_config!(@setup_assemblies, @assertions)
+        warnings = ec.verify_config!(@setup_assemblies, @assertions)
+        puts warnings if warnings
       end
     end
 
