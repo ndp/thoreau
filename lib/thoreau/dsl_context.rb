@@ -38,7 +38,7 @@ module Thoreau
     end
 
     def each_equivalence_class(&block)
-      @equivalence_classes.each { |kase| block.call(kase) }
+      @equivalence_classes.each { |ec| block.call(ec) }
     end
   end
 end
