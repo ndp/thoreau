@@ -26,8 +26,8 @@ module Thoreau
               temp_context = Object.new
               setup_value  = setup_block.call(temp_context)
               setup_value_str = (setup_value || 'nil').to_s.truncate(30)
-              description     = assertion.description
-              description.concat " when given #{setup_value_str}" unless setup_value_str.match?(/^\[?#</) || description.include?(setup_value_str)
+              description     = "" + assertion.description
+              description += " when given #{setup_value_str}" unless setup_value_str.match?(/^\[?#</) || description.include?(setup_value_str)
 
               it description do
 
