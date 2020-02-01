@@ -11,10 +11,7 @@ module Thoreau
 
     # Extend RSpec with a swagger-based DSL
     ::RSpec.configure do |c|
-      c.add_setting :swagger_root
-      c.add_setting :swagger_docs
-      c.add_setting :swagger_dry_run
-      c.add_setting :swagger_format
+      #c.add_setting :swagger_root
       c.extend ExampleGroupHelpers
       c.include ExampleHelpers
     end
