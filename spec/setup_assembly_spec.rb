@@ -23,15 +23,19 @@ RSpec.describe Thoreau::SetupAssembly do
 
   describe '#each_setup_block' do
 
-    cases 'when `value` is a hard-coded value'              => 'returns single value',
-          'when `value` is a proc'                          => 'returns single value',
-          'when `value` is block returning a value'         => 'returns single value',
-          'when `value` is block returning multiple values' => 'returns multiple values',
-          'when `value` is procs'                           => 'returns multiple values',
-          'when `value` is an iterator'                     => 'returns multiple values',
-          'when `value` is nil'                             => 'returns nil'
+    cases 'when `value` is a hard-coded value'                     => 'returns single value',
+          'when `value` is a proc'                                 => 'returns single value',
+          'when `value` is block returning a value'                => 'returns single value',
+          'when `value` is an array of hard-coded values'          => 'returns single value',
+          'when `value` is block returning multiple values'        => 'returns multiple values',
+          'when `value` is an array if array of hard-coded values' => 'returns multiple values',
+          'when `value` is procs'                                  => 'returns multiple values',
+          'when `value` is an iterator'                            => 'returns multiple values',
+          'when `value` is nil'                                    => 'returns nil'
 
     setup('when `value` is a hard-coded value', 1)
+    setup('when `value` is an array of hard-coded values', [1])
+    setup('when `value` is an array if array of hard-coded values', [[1, 2, 'three']])
     setup('when `value` is block returning a value') { 1 }
     setup('when `value` is block returning multiple values') { [1, 2, 'three'] }
     setup('when `value` is a proc') { -> (_) { 1 } }
