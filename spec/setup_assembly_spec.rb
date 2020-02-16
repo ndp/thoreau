@@ -79,20 +79,25 @@ RSpec.describe Thoreau::SetupAssembly do
     subject { Thoreau::SetupAssembly.new('desc', i: 2) }
 
     specify 'handles empty list' do
-      expect(subject.combos_of([[]])).to eq([{}])
+      expect(subject.combos_of([])).to eq([{}])
     end
 
     specify 'handles one item list' do
-      expect(subject.combos_of([[[:i, 1]]])).to eq([{i: 1}])
+      expect(subject.combos_of([[[:i, 1]]])).to eq([{ i: 1 }])
     end
 
-    specify 'handles top-level combos' do
-      expect(subject.combos_of([[[:i, 1]], [[:j, 1]], [[:k, 1]]])).to eq([{i:1, j:2, k:3}])
+    specify 'creates map of distinct combos' do
+      expect(subject.combos_of([[[:i, 1]], [[:j, 2]], [[:k, 3]]])).to eq([{ i: 1, j: 2, k: 3 }])
     end
 
 
-    specify 'handles three item list' do
-      expect(subject.combos_of([[[:i, 1], [:i, 2], [:i, 3]]])).to eq([[[:i, 1]], [[:i, 2]], [[:i, 3]]])
+    specify 'create three maps for three values' do
+      expect(subject.combos_of([[[:i, 1], [:i, 2], [:i, 3]]])).to eq([{ i: 1 }, { i: 2 }, { i: 3 }])
+    end
+
+    specify 'create combinations of values' do
+      expect(subject.combos_of([[[:i, 1], [:i, 2]], [[:j, 3], [:j, 4]]])).
+        to eq([{ i: 1, j:3 }, { i: 1, j:4 },{ i: 2, j:3 }, { i: 2, j:4 }])
     end
 
   end
@@ -116,14 +121,33 @@ RSpec.describe Thoreau::SetupAssembly do
         end
       end
 
+      specify 'creates description with the variable in it' do
+        subject = Thoreau::SetupAssembly.new('desc', i: 2)
+
+        subject.setup_blocks.each do |blk|
+          expect(blk.description).to eq("desc with i=2")
+        end
+      end
+
       specify 'injects accessor fn with the name of the key' do
         subject = Thoreau::SetupAssembly.new('desc', j: 3)
 
-        blks = subject.setup_blocks
-        blks.each do |blk|
+        subject.setup_blocks.each do |blk|
           context = Object.new
           blk.call(context)
           expect(context.j).to eq(3)
+        end
+      end
+
+      specify 'raises if accessor function is already defined' do
+        subject = Thoreau::SetupAssembly.new('desc', j: 3)
+
+        subject.setup_blocks.each do |blk|
+          context = Object.new
+          def context.j; end
+          expect {
+            blk.call(context)
+          }.to raise_exception('`j` is already defined in the context. This will be confusing.')
         end
       end
 
@@ -143,6 +167,14 @@ RSpec.describe Thoreau::SetupAssembly do
 
         expect(context.i).to eq(2)
         expect(context.j).to eq(3)
+      end
+
+      specify 'creates description with multiple variables in it' do
+        subject = Thoreau::SetupAssembly.new('desc', i: 2, j: 3)
+
+        subject.setup_blocks.each do |blk|
+          expect(blk.description).to eq("desc with i=2 j=3")
+        end
       end
 
       specify 'sets up one variable with multiple values' do
@@ -191,12 +223,14 @@ RSpec.describe Thoreau::SetupAssembly do
         context = Object.new
         blks.first.call(context)
         expect(context.i).to eq(1)
+        expect(context.b).to eq(true)
         context = Object.new
         blks[1].call(context)
-        expect(context.i).to eq(2)
+        expect(context.i).to eq(1)
+        expect(context.b).to eq(false)
         context = Object.new
         blks.last.call(context)
-        expect(context.i).to eq(3)
+        expect(context.i).to eq(2)
       end
     end
   end
