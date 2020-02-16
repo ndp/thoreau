@@ -25,6 +25,7 @@ module Thoreau
             ec.each_test do |setup_block, action_block, assertion|
               temp_context = Object.new
               setup_value  = setup_block.call(temp_context)
+              pp setup_value: setup_value
               setup_value_str = (setup_value || 'nil').to_s.truncate(30)
               description     = "" + assertion.description
               description += " when given #{setup_value_str}" unless setup_value_str.match?(/^\[?#</) || description.include?(setup_value_str)

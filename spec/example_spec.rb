@@ -8,15 +8,15 @@ end
 
 RSpec.describe 'Thoreau: example' do
 
-  cases 'any integer input': 'doubles the input',
-        'nil input':         'returns nil',
-        'any string input':  'returns nil'
+  cases 'any integer `i`':  'doubles the input',
+        'nil input':        'returns nil',
+        'any string input': 'returns nil'
 
   action { |input| dbl(input) }
 
-  setup('any integer input', [0, -1, 1, 1 << 32, -(1 << 32)])
-  setup 'nil input', nil
-  setup('any string input', ['', 'foo', '*' * 10000] )
+  setup('any integer `i`', i: [0, -1, 1, 1 << 32, -(1 << 32)])
+  setup 'nil input', i: nil
+  setup('any string input', i: ['', 'foo', '*' * 10000])
 
   asserts 'doubles the input' do |actual, input|
     expect(actual).to eq (input << 1)

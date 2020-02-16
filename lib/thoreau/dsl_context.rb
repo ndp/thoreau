@@ -18,6 +18,7 @@ module Thoreau
     end
 
     def setup(desc, values = nil, &block)
+      pp DSLContextsetup: values, klass: values.class
       @setup_assemblies << SetupAssembly.new(desc, values || block)
     end
 
