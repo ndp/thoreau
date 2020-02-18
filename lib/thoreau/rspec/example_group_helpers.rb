@@ -21,29 +21,25 @@ module Thoreau
         thoreau_context.verify_config!
 
         thoreau_context.each_equivalence_class do |ec|
-          describe ec.setup_key do
-            ec.each_test do |setup_block, action_block, assertion|
-              temp_context = Object.new
-              setup_value  = setup_block.call(temp_context)
-              pp setup_value: setup_value
-              setup_value_str = (setup_value || 'nil').to_s.truncate(30)
-              description     = "" + assertion.description
-              description += " when given #{setup_value_str}" unless setup_value_str.match?(/^\[?#</) || description.include?(setup_value_str)
+          ec.each_test do |setup_block, action_block, assertion|
+            temp_context = Object.new
+            setup_value  = setup_block.call(temp_context)
+            description     = (setup_block.respond_to?(:description) ? setup_block.description : ec.setup_key.to_s)
+            description     += ' ' + assertion.description
 
-              it description do
+            specify description do
 
-                # Transfer any variables set in the `setup` into the
-                # actual test context
-                temp_context.instance_variables.each do |iv|
-                  self.instance_variable_set(iv, temp_context.instance_variable_get(iv))
-                end
+              ## Transfer any variables set in the `setup` into the
+              ## actual test context
+              temp_context.instance_variable_set(:@outer_self, self)
 
-                # Action
-                result = action_block ? self.instance_exec(setup_value, &action_block) : setup_value
-
-                # Assertion
-                assertion.exec_in_context(self, result, setup_value)
+              def temp_context.method_missing(m, *args, &block)
+                @outer_self.send(m, *args, &block)
               end
+
+              result = action_block ? temp_context.instance_exec(setup_value, &action_block) : setup_value
+              result = result.is_a?(Hash) && result.keys == [SetupAssembly::IMPLICIT_VAR_NAME] ? result[SetupAssembly::IMPLICIT_VAR_NAME] : result
+              assertion.exec_in_context(temp_context, result, setup_value)
             end
           end
         end

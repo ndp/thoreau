@@ -51,7 +51,7 @@ module Thoreau
     end
 
     def each_test(&block)
-      @setup.each_setup_block do |setup_block|
+      @setup.setup_blocks.each do |setup_block|
         @assertions.each do |assertion|
           block.call(setup_block, @action_block, assertion)
         end
