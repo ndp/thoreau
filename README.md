@@ -1,4 +1,5 @@
-# Thoreau
+# Thoreau  <img src='https://travis-ci.org/ndp/thoreau.svg?branch=master' />
+
 
 A more thoughtful test framework
 
