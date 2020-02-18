@@ -12,6 +12,6 @@ Rake::TestTask.new(:minitest) do |t|
 end
 
 desc 'Run RSpec and MiniTest'
-task(:test => [:rspec, :minitest])
+task(:test => [:rspec])
 
 task :default => :test
