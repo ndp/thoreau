@@ -54,7 +54,7 @@ module Thoreau
         result = @desc
 
         if @map_of_values.keys == [IMPLICIT_VAR_NAME] # if just one value,
-          v = @map_of_values[IMPLICIT_VAR_NAME].to_s
+          v      = @map_of_values[IMPLICIT_VAR_NAME].to_s
           result += " (#{v})" unless v.match?(/^\[?#</) || result.include?(v)
         else
           result += " (#{@map_of_values.keys.sort.map { |k| "#{k}=#{@map_of_values[k].pretty_inspect.strip.truncate(30)}" }.join(' ')})"

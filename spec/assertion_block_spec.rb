@@ -40,12 +40,12 @@ RSpec.describe Thoreau::AssertionBlock do
 
   action do |subject|
     @context = Object.new
-    @context.instance_variable_set(:combos_of, 'bar')
+    @context.instance_variable_set(:@foo, 'bar')
     subject.exec_in_context(@context, 'result', 'setup value')
   end
 
   asserts 'context variables are available in block' do
-    expect(@context.instance_variable_get(:combos_of)).to eq 'bar'
+    expect(@context.instance_variable_get(:@foo)).to eq 'bar'
   end
 
   asserts 'passes `setup_value` to block' do

@@ -4,15 +4,15 @@ RSpec.describe Thoreau::EquivalenceClass do
 
   cases 'configured with setup and asserts' =>
           '`each_test` yields setup value, action_block and assertion',
-        'configured with unknown setup'               =>
+        'configured with unknown setup'     =>
           'verify_config! returns error',
-        'configured with unknown asserts'             =>
+        'configured with unknown asserts'   =>
           'verify_config! returns error'
 
   setup 'configured with setup and asserts' do
     Thoreau::EquivalenceClass.new('setup1', 'assert1').tap do |subject|
       subject.verify_config!(
-        [Thoreau::SetupAssembly.new(:setup1, [:setup_result])],
+        [Thoreau::SetupAssembly.new(:setup1, :setup_result)],
         [Thoreau::AssertionBlock.new(:assert1, -> {})])
     end
   end

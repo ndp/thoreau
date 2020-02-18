@@ -1,21 +1,21 @@
 RSpec.describe Thoreau::SetupAssembly do
 
-  describe 'identifiers' do
+  describe 'description' do
 
-    cases 'described with string' => ['`key` is symbol', '`description` is string'],
-          'described with symbol' => ['`key` is symbol', '`description` is string']
+    cases 'initalized with string' => ['`.key` is symbol', '`.description` is string'],
+          'initalized with symbol' => ['`.key` is symbol', '`.description` is string']
 
-    setup("described with string", description: 'description')
-    setup("described with symbol", description: :description)
+    setup('initalized with string', 'a string')
+    setup('initalized with symbol', :'a string')
 
-    action { Thoreau::SetupAssembly.new(description, 1) }
+    action { |input| Thoreau::SetupAssembly.new(input, 1) }
 
-    asserts "`key` is symbol" do |subject|
-      expect(subject.key).to eq(:description)
+    asserts '`.key` is symbol' do |subject, result|
+      expect(subject.key).to eq(:'a string')
     end
 
-    asserts "`description` is string" do |subject|
-      expect(subject.description).to eq('description')
+    asserts '`.description` is string' do |subject|
+      expect(subject.description).to eq('a string')
     end
 
     generate!
@@ -32,13 +32,13 @@ RSpec.describe Thoreau::SetupAssembly do
           'when `value` is block returning a value'                => 'returns single value',
           'when `value` is an array of hard-coded values'          => 'returns single value',
           'when `value` is block returning multiple values'        => 'returns multiple values',
-          'when `value` is an array if array of hard-coded values' => 'returns multiple values',
+          'when `value` is an array of array of hard-coded values' => 'returns multiple values',
           #'when `value` is an iterator returning multiple values'  => 'returns multiple values',
-          'when `value` is nil'                                    => 'returns nil'
+          'when `value` is nil' => 'returns nil'
 
     setup('when `value` is a hard-coded value', 1)
     setup('when `value` is an array of hard-coded values', [1])
-    setup('when `value` is an array if array of hard-coded values', [[1, 2, 'three']])
+    setup('when `value` is an array of array of hard-coded values', [[1, 2, 'three']])
     setup('when `value` is block returning a value') { 1 }
     setup('when `value` is block returning multiple values') { [1, 2, 'three'] }
     setup('when `value` is a proc', -> (_) { 1 })
@@ -52,7 +52,7 @@ RSpec.describe Thoreau::SetupAssembly do
     #  end
     #end
     setup 'when `value` is nil', nil
-    setup "when `value` is a hash", foo: 7
+    setup 'when `value` is a hash', foo: 7
 
     #action do |value|
     #  subject = Thoreau::SetupAssembly.new('desc', value)
@@ -63,8 +63,8 @@ RSpec.describe Thoreau::SetupAssembly do
     asserts('returns single value') { |result| expect(result).to eq 1 }
     asserts('returns multiple values') { |result| expect(result).to eq [1, 2, 'three'] }
     asserts('returns nil') { |result| expect(result).to eq nil }
-    asserts("assigns instance variables") { expect(@foo).to eq(7) }
-    asserts("assigns properties in context") { expect(foo).to eq(7) }
+    asserts('assigns instance variables') { expect(@foo).to eq(7) }
+    asserts('assigns properties in context') { expect(foo).to eq(7) }
 
     generate!
 
@@ -120,7 +120,7 @@ RSpec.describe Thoreau::SetupAssembly do
         subject = Thoreau::SetupAssembly.new('desc', i: 2)
 
         subject.setup_blocks.each do |blk|
-          expect(blk.description).to eq("desc (i=2)")
+          expect(blk.description).to eq('desc (i=2)')
         end
       end
 
@@ -128,7 +128,7 @@ RSpec.describe Thoreau::SetupAssembly do
         subject = Thoreau::SetupAssembly.new('desc', input: 2)
 
         subject.setup_blocks.each do |blk|
-          expect(blk.description).to eq("desc (2)")
+          expect(blk.description).to eq('desc (2)')
         end
       end
 
@@ -179,7 +179,7 @@ RSpec.describe Thoreau::SetupAssembly do
         subject = Thoreau::SetupAssembly.new('desc', i: 2, j: 3)
 
         subject.setup_blocks.each do |blk|
-          expect(blk.description).to eq("desc (i=2 j=3)")
+          expect(blk.description).to eq('desc (i=2 j=3)')
         end
       end
 

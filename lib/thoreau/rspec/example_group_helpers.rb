@@ -24,25 +24,30 @@ module Thoreau
           ec.each_test do |setup_block, action_block, assertion|
             temp_context = Object.new
             setup_value  = setup_block.call(temp_context)
-            description     = (setup_block.respond_to?(:description) ? setup_block.description : ec.setup_key.to_s)
-            description     += ' ' + assertion.description
+            description  = (setup_block.respond_to?(:description) ? setup_block.description : ec.setup_key.to_s)
+            description  += ' ' + assertion.description
 
             specify description do
 
               ## Transfer any variables set in the `setup` into the
               ## actual test context
-              temp_context.instance_variable_set(:@outer_self, self)
-
+              temp_context.instance_variable_set(:@_outer_self, self)
               def temp_context.method_missing(m, *args, &block)
-                @outer_self.send(m, *args, &block)
+                @_outer_self.send(m, *args, &block)
               end
 
-              result = action_block ? temp_context.instance_exec(setup_value, &action_block) : setup_value
-              result = result.is_a?(Hash) && result.keys == [SetupAssembly::IMPLICIT_VAR_NAME] ? result[SetupAssembly::IMPLICIT_VAR_NAME] : result
-              assertion.exec_in_context(temp_context, result, setup_value)
+              result = action_block ? temp_context.instance_exec(ExampleGroupHelpers.implicit_param(setup_value), &action_block) : setup_value
+
+              assertion.exec_in_context(temp_context, ExampleGroupHelpers.implicit_param(result), setup_value)
             end
           end
         end
+      end
+
+      def self.implicit_param(params)
+        params.is_a?(Hash) &&
+          params.keys == [SetupAssembly::IMPLICIT_VAR_NAME] ?
+          params[SetupAssembly::IMPLICIT_VAR_NAME] : params
       end
     end
   end
