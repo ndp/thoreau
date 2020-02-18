@@ -28,7 +28,7 @@ RSpec.describe Thoreau::EquivalenceClass do
 
     yielded_data = result.first
     expect(yielded_data.size).to eq(3)
-    expect(yielded_data.first.call).to eq(:setup_result)
+    expect(yielded_data.first.call(Object.new)).to eq(:setup_result)
     expect(yielded_data[1]).to eq(nil)
     expect(yielded_data.last.key).to eq(:assert1)
   end

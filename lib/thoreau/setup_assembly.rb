@@ -63,8 +63,16 @@ module Thoreau
       end
 
       def call(*args)
-        @proc.call(*args)
+        implicit_param @proc.call(*args)
       end
+
+      private
+      def implicit_param(params)
+        params.is_a?(Hash) &&
+          params.keys == [SetupAssembly::IMPLICIT_VAR_NAME] ?
+          params[SetupAssembly::IMPLICIT_VAR_NAME] : params
+      end
+
     end
 
     def setup_blocks
