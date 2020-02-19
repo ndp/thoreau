@@ -1,10 +1,34 @@
 require_relative './spec_helper'
 
-def dbl(x)
+def example(x)
   return nil if x.is_a?(String)
   x * 2 rescue nil
 end
 
+
+RSpec.describe 'Thoreau: Example using implicit data' do
+
+  cases 'any integer': 'doubles the input',
+        'nil input':   'returns nil',
+        'any string':  'returns nil'
+
+  action { |input| example(input) }
+
+  setup('any integer', [0, -1, 1, 1 << 32, -(1 << 32)])
+  setup 'nil input', nil
+  setup('any string', ['', 'foo', '*' * 10000])
+
+  asserts 'doubles the input' do |actual, i|
+    expect(actual).to eq (i << 1)
+  end
+
+  asserts 'returns nil' do |actual|
+    expect(actual).to eq nil
+  end
+
+  generate!
+
+end
 
 RSpec.describe 'Thoreau: Example using named variables' do
 
@@ -12,7 +36,7 @@ RSpec.describe 'Thoreau: Example using named variables' do
         'nil input':        'returns nil',
         'any string input': 'returns nil'
 
-  action { dbl(i) }
+  action { example(i) }
 
   setup('any integer `i`', i: [0, -1, 1, 1 << 32, -(1 << 32)])
   setup 'nil input', i: nil
@@ -30,26 +54,3 @@ RSpec.describe 'Thoreau: Example using named variables' do
 
 end
 
-RSpec.describe 'Thoreau: Example using implicit variables' do
-
-  cases 'any integer':      'doubles the input',
-        'nil input':        'returns nil',
-        'any string input': 'returns nil'
-
-  action { |input| dbl(input) }
-
-  setup('any integer `i`', [0, -1, 1, 1 << 32, -(1 << 32)])
-  setup 'nil input', nil
-  setup('any string input', ['', 'foo', '*' * 10000])
-
-  asserts 'doubles the input' do |actual, i|
-    expect(actual).to eq (i << 1)
-  end
-
-  asserts 'returns nil' do |actual|
-    expect(actual).to eq nil
-  end
-
-  generate!
-
-end
