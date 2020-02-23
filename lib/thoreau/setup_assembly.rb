@@ -1,13 +1,16 @@
 # Represents a set of inputs or different setups.
-# Setting "values" can be:
-# * an enumerable, yielding each value (dynamic is fine). This
-#   can be a hard-coded array, or a dynamic randomizing function.
-# * a single value
 module Thoreau
   class SetupAssembly
 
     IMPLICIT_VAR_NAME = :input # used when the user has just one, unnamed variable
 
+    # @desc {String} name of the setup assembly, used to build a description and as an identifier.
+    # @values {Hash|enumerable|Proc|nil|anything} can be anything that will provide the setup
+    # for the test. This can be:
+    # * for simple functions an input value (here called "implicit var")
+    # * for test subjects requiring multiple values, this can be a hash
+    # * for functional tests, this can be a block runs arbitrary Ruby code
+    # At the same time, if this is enumerable, multiple test setups will be generated, one for each value.
     def initialize(desc, values = nil, &block)
       @desc   = desc
       @block  = block
