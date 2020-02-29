@@ -19,7 +19,7 @@ module Thoreau
 
     def setup(desc, values = nil, &block)
       pp ''
-      @setup_assemblies << SetupAssembly.new(desc, values || block)
+      @setup_assemblies << SetupAssembler.new(desc, values || block)
     end
 
     def action(&block)

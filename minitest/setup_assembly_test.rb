@@ -1,6 +1,6 @@
 require_relative './test_helper'
 
-describe Thoreau::SetupAssembly do
+describe Thoreau::SetupAssembler do
 
   thoreau do
 
@@ -27,7 +27,7 @@ describe Thoreau::SetupAssembly do
     setup 'nil', nil
 
     action do |input|
-      subject = Thoreau::SetupAssembly.new('desc', input)
+      subject = Thoreau::SetupAssembler.new('desc', input)
       [].tap do |result|
         subject.each_setup_block { |b| result << b.call }
       end

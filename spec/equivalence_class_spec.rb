@@ -12,7 +12,7 @@ RSpec.describe Thoreau::EquivalenceClass do
   setup 'configured with setup and asserts' do
     Thoreau::EquivalenceClass.new('setup1', 'assert1').tap do |subject|
       subject.verify_config!(
-        [Thoreau::SetupAssembly.new(:setup1, :setup_result)],
+        [Thoreau::SetupAssembler.new(:setup1, :setup_result)],
         [Thoreau::AssertionBlock.new(:assert1, -> {})])
     end
   end
@@ -43,7 +43,7 @@ RSpec.describe Thoreau::EquivalenceClass do
   setup "configured with unknown asserts" do
     Thoreau::EquivalenceClass.new('setup1', 'assert1').
       verify_config!(
-        [Thoreau::SetupAssembly.new(:setup1, [:setup_result])],
+        [Thoreau::SetupAssembler.new(:setup1, [:setup_result])],
         [])
   end
 

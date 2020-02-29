@@ -32,7 +32,7 @@ module Thoreau
         warnings << "    setup \"#{@setup_key.to_s}\" do\n"
         warnings << "    end\n"
         warnings << "# Available: #{available_keys}\n" unless available_keys.empty?
-        @setup = SetupAssembly.new('ec.setup_key', nil)
+        @setup = SetupAssembler.new('ec.setup_key', nil)
       end
 
       available_keys = assertions.map(&:description).map { |x| "`#{x}`" }.to_sentence

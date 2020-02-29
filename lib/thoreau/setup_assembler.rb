@@ -1,6 +1,6 @@
 # Represents a set of inputs or different setups.
 module Thoreau
-  class SetupAssembly
+  class SetupAssembler
 
     IMPLICIT_VAR_NAME = :input # used when the user has just one, unnamed variable
 
@@ -12,19 +12,8 @@ module Thoreau
     # * for functional tests, this can be a block runs arbitrary Ruby code
     # At the same time, if this is enumerable, multiple test setups will be generated, one for each value.
     def initialize(desc, values = nil, &block)
-      @desc   = desc
-      @block  = block
-      @values = case values
-                when Hash
-                  values
-                when nil
-                  { input: nil }
-                when Proc
-                  @block = values
-                  nil
-                else
-                  { input: values }
-                end
+      @desc           = desc
+      @block, @values = values.is_a?(Proc) ? [values, nil] : [block, values]
     end
 
     def description
@@ -35,8 +24,60 @@ module Thoreau
       @desc.to_sym
     end
 
+    def setup_blocks
+      return [BlockSetup.new(@desc, @block)] if @block
+
+      case @values
+      when Hash
+        setups_from_hash(@values)
+      else
+        setups_from_hash(IMPLICIT_VAR_NAME => @values)
+      end
+    end
+
+    def apply_to(values, &block)
+      if values.respond_to?(:each)
+        values.each(&block)
+      else
+        block.call(values)
+      end
+    end
+
+    def combos_of(entries)
+      return [{}] if entries.size == 0
+
+      first_response = entries.first.map { |x| { x[0] => x[1] } }
+      return first_response if entries.size == 1
+
+      combos_of_rest = combos_of(entries.slice(1..(entries.size)))
+
+      first_response.flat_map do |f|
+        combos_of_rest.map { |r| r.merge(f) }
+      end
+    end
+
+    private
+
+    def setups_from_hash(hash)
+      vars = []
+      hash.entries.map do |key, value|
+        [key, value.respond_to?(:each) ? value : Array(value)]
+      end.entries.each do |key, value|
+        # Note: this could be written as:
+        # ```
+        # vars.push value.map { |v| result << [key, v] }
+        # ```
+        # but then if the caller passes in just an `each`, it wouldn't work.
+        # TODO figure out how to wrap this... there's gotta be a nice Ruby way.
+        result = []
+        value.each { |v| result << [key, v] }
+        vars.push result
+      end
+      combos_of(vars).map { |values| HashSetup.new(@desc, values) }
+    end
+
     # a single set-up block for a test
-    class Setup
+    class HashSetup
       def initialize(description, map_of_values)
         @desc          = description
         @map_of_values = map_of_values
@@ -70,63 +111,34 @@ module Thoreau
       end
 
       private
+
       def implicit_param(params)
         params.is_a?(Hash) &&
-          params.keys == [SetupAssembly::IMPLICIT_VAR_NAME] ?
-          params[SetupAssembly::IMPLICIT_VAR_NAME] : params
+          params.keys == [SetupAssembler::IMPLICIT_VAR_NAME] ?
+          params[SetupAssembler::IMPLICIT_VAR_NAME] : params
       end
 
     end
 
-    def setup_blocks
-      if @block
-        return [Proc.new do |context|
-          context.instance_eval(&@block).tap do |result|
+    class BlockSetup
+      def initialize(desc, block)
+        @desc = desc
+        @proc = Proc.new do |context|
+          context.instance_eval(&block).tap do |result|
             (
             class << context;
               self;
             end).send(:define_method, IMPLICIT_VAR_NAME) { result }
           end
-        end]
-      end
-
-      case @values
-      when Hash
-        # expand iterable values, eg. `i=>[1,2]` to [[:i, 1], [:i,2]]
-        vars = []
-        @values.entries.each do |entry|
-          # map, but we just want to work with a simple `each`
-          result = []
-          (entry[1].respond_to?(:each) ? entry[1] : Array(entry[1])).each do |v|
-            result << [entry[0], v]
-          end
-          vars.push result
         end
-        combos_of(vars).map { |values| Setup.new(@desc, values) }
-
-      else
-        raise "huh? #{@values}"
       end
-    end
 
-    def apply_to(values, &block)
-      if values.respond_to?(:each)
-        values.each(&block)
-      else
-        block.call(values)
+      def description
+        @desc
       end
-    end
 
-    def combos_of(entries)
-      return [{}] if entries.size == 0
-
-      first_response = entries.first.map { |x| { x[0] => x[1] } }
-      return first_response if entries.size == 1
-
-      combos_of_rest = combos_of(entries.slice(1..(entries.size)))
-
-      first_response.flat_map do |f|
-        combos_of_rest.map { |r| r.merge(f) }
+      def call(*args)
+        @proc.call(*args)
       end
     end
 

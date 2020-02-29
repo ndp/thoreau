@@ -46,8 +46,8 @@ module Thoreau
 
       def self.implicit_param(params)
         params.is_a?(Hash) &&
-          params.keys == [SetupAssembly::IMPLICIT_VAR_NAME] ?
-          params[SetupAssembly::IMPLICIT_VAR_NAME] : params
+          params.keys == [SetupAssembler::IMPLICIT_VAR_NAME] ?
+          params[SetupAssembler::IMPLICIT_VAR_NAME] : params
       end
     end
   end

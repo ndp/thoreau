@@ -1,4 +1,4 @@
-RSpec.describe Thoreau::SetupAssembly do
+RSpec.describe Thoreau::SetupAssembler do
 
   describe 'description' do
 
@@ -8,7 +8,7 @@ RSpec.describe Thoreau::SetupAssembly do
     setup('initalized with string', 'a string')
     setup('initalized with symbol', :'a string')
 
-    action { |input| Thoreau::SetupAssembly.new(input, 1) }
+    action { |input| Thoreau::SetupAssembler.new(input, 1) }
 
     asserts '`.key` is symbol' do |subject, result|
       expect(subject.key).to eq(:'a string')
@@ -71,7 +71,7 @@ RSpec.describe Thoreau::SetupAssembly do
   end
 
   describe '#combos_of' do
-    subject { Thoreau::SetupAssembly.new('desc', i: 2) }
+    subject { Thoreau::SetupAssembler.new('desc', i: 2) }
 
     specify 'handles empty list' do
       expect(subject.combos_of([])).to eq([{}])
@@ -98,15 +98,72 @@ RSpec.describe Thoreau::SetupAssembly do
   end
   describe '#setup_blocks' do
 
-    describe 'given a hash' do
+    # single value: 1, "foo"
+    # multiple values in one spec: i: 1, j: 2 -- desc (i=2 j=3)
+    # multiple setups: [1, 2]
+    # combinations of values:  i: [1, 2, 3], b: true
 
-      specify 'with one key => one value value returns one block' do
-        subject = Thoreau::SetupAssembly.new('desc', i: 2)
+    describe 'given single harded-coded value' do
+
+      specify 'exposes single value as `input`' do
+        subject = Thoreau::SetupAssembler.new('desc', 2)
+
+        setup_blocks = subject.setup_blocks
+        expect(setup_blocks.size).to eq(1)
+
+        context = Object.new
+        setup_blocks.each { |blk| blk.call(context) }
+
+        expect(context.input).to eq 2
+      end
+    end
+
+    describe 'given an array of harded-coded values' do
+
+      #            'when `value` is an array of hard-coded values'          => 'returns single value',
+      specify 'generates a setup for each value' do
+        subject = Thoreau::SetupAssembler.new('desc', [1, 2, 'three'])
+
+        setup_blocks = subject.setup_blocks
+        expect(setup_blocks.size).to eq(3)
+
+        context = Object.new
+        setup_blocks[0].call(context)
+        expect(context.input).to eq 1
+        setup_blocks[1].call(context)
+        expect(context.input).to eq 2
+        setup_blocks[2].call(context)
+        expect(context.input).to eq 'three'
+      end
+
+    end
+
+
+    describe 'given a hash with one key' do
+
+      specify '`description` has value in it' do
+        subject = Thoreau::SetupAssembler.new('desc', input: 2)
+
+        subject.setup_blocks.each do |blk|
+          expect(blk.description).to eq('desc (2)')
+        end
+      end
+
+      specify '`description` has a named variable and value in it' do
+        subject = Thoreau::SetupAssembler.new('desc', i: 2)
+
+        subject.setup_blocks.each do |blk|
+          expect(blk.description).to eq('desc (i=2)')
+        end
+      end
+
+      specify 'creates one block' do
+        subject = Thoreau::SetupAssembler.new('desc', i: 2)
         expect(subject.setup_blocks.size).to eq(1)
       end
 
-      specify 'injects ivar with the name of the key' do
-        subject = Thoreau::SetupAssembly.new('desc', i: 2)
+      specify 'block injects ivar with the name of the key' do
+        subject = Thoreau::SetupAssembler.new('desc', i: 2)
 
         blks = subject.setup_blocks
         blks.each do |blk|
@@ -116,24 +173,8 @@ RSpec.describe Thoreau::SetupAssembly do
         end
       end
 
-      specify 'creates description with the variable in it' do
-        subject = Thoreau::SetupAssembly.new('desc', i: 2)
-
-        subject.setup_blocks.each do |blk|
-          expect(blk.description).to eq('desc (i=2)')
-        end
-      end
-
-      specify 'creates description without lone "input" variable in it' do
-        subject = Thoreau::SetupAssembly.new('desc', input: 2)
-
-        subject.setup_blocks.each do |blk|
-          expect(blk.description).to eq('desc (2)')
-        end
-      end
-
-      specify 'injects accessor fn with the name of the key' do
-        subject = Thoreau::SetupAssembly.new('desc', j: 3)
+      specify 'block injects accessor fn with the name of the key' do
+        subject = Thoreau::SetupAssembler.new('desc', j: 3)
 
         subject.setup_blocks.each do |blk|
           context = Object.new
@@ -142,8 +183,8 @@ RSpec.describe Thoreau::SetupAssembly do
         end
       end
 
-      specify 'raises if accessor function is already defined' do
-        subject = Thoreau::SetupAssembly.new('desc', j: 3)
+      specify 'block raises if accessor function is already defined' do
+        subject = Thoreau::SetupAssembler.new('desc', j: 3)
 
         subject.setup_blocks.each do |blk|
           context = Object.new
@@ -157,8 +198,8 @@ RSpec.describe Thoreau::SetupAssembly do
         end
       end
 
-      specify 'does not pollute general context with specific behaviors' do
-        subject = Thoreau::SetupAssembly.new('desc', i: 2)
+      specify 'block does not pollute general context with specific behaviors' do
+        subject = Thoreau::SetupAssembler.new('desc', i: 2)
 
         subject.setup_blocks.each { |blk| blk.call(Object.new) }
 
@@ -166,7 +207,7 @@ RSpec.describe Thoreau::SetupAssembly do
       end
 
       specify 'sets up multiple variables with one value' do
-        subject = Thoreau::SetupAssembly.new('desc', i: 2, j: 3)
+        subject = Thoreau::SetupAssembler.new('desc', i: 2, j: 3)
 
         context = Object.new
         subject.setup_blocks.each { |blk| blk.call(context) }
@@ -176,7 +217,7 @@ RSpec.describe Thoreau::SetupAssembly do
       end
 
       specify 'creates description with multiple variables in it' do
-        subject = Thoreau::SetupAssembly.new('desc', i: 2, j: 3)
+        subject = Thoreau::SetupAssembler.new('desc', i: 2, j: 3)
 
         subject.setup_blocks.each do |blk|
           expect(blk.description).to eq('desc (i=2 j=3)')
@@ -184,7 +225,7 @@ RSpec.describe Thoreau::SetupAssembly do
       end
 
       specify 'sets up one variable with multiple values' do
-        subject = Thoreau::SetupAssembly.new('desc', i: [1, 2, 3])
+        subject = Thoreau::SetupAssembler.new('desc', i: [1, 2, 3])
 
         blks = subject.setup_blocks
         expect(blks.size).to eq(3)
@@ -201,7 +242,7 @@ RSpec.describe Thoreau::SetupAssembly do
       end
 
       specify 'sets up two keys, one with multiple values' do
-        subject = Thoreau::SetupAssembly.new('desc', i: [1, 2, 3], b: true)
+        subject = Thoreau::SetupAssembler.new('desc', i: [1, 2, 3], b: true)
 
         blks = subject.setup_blocks
         expect(blks.size).to eq(3)
@@ -221,7 +262,7 @@ RSpec.describe Thoreau::SetupAssembly do
       end
 
       specify 'sets up two keys, each with multiple values' do
-        subject = Thoreau::SetupAssembly.new('desc', i: [1, 2], b: [true, false])
+        subject = Thoreau::SetupAssembler.new('desc', i: [1, 2], b: [true, false])
 
         blks = subject.setup_blocks
         expect(blks.size).to eq(4)
@@ -241,41 +282,19 @@ RSpec.describe Thoreau::SetupAssembly do
     end
 
     # 'when `value` is a hard-coded value'                     => 'returns single value',
-    describe 'given harded coded values' do
-      specify 'exposes single value as `input`' do
-        subject = Thoreau::SetupAssembly.new('desc', 2)
-
-        setup_blocks = subject.setup_blocks
-        expect(setup_blocks.size).to eq(1)
-
-        context = Object.new
-        setup_blocks.each { |blk| blk.call(context) }
-
-        expect(context.input).to eq 2
-      end
-
-      #            'when `value` is an array of hard-coded values'          => 'returns single value',
-      specify 'exposes array of values as `input`' do
-        subject = Thoreau::SetupAssembly.new('desc', [1, 2, 'three'])
-
-        setup_blocks = subject.setup_blocks
-        expect(setup_blocks.size).to eq(3)
-
-        context = Object.new
-        setup_blocks[0].call(context)
-        expect(context.input).to eq 1
-        setup_blocks[1].call(context)
-        expect(context.input).to eq 2
-        setup_blocks[2].call(context)
-        expect(context.input).to eq 'three'
-      end
-
-    end
     describe 'blocks & procs' do
+
+      specify 'describes with given name' do
+        subject = Thoreau::SetupAssembler.new('desc') do
+          2
+        end
+
+        expect(subject.description).to eq('desc')
+      end
 
       #'when `value` is block returning a value'                => 'returns single value',
       specify 'when block returns a value, exposes single value as `input`' do
-        subject = Thoreau::SetupAssembly.new('desc') do
+        subject = Thoreau::SetupAssembler.new('desc') do
           2
         end
 
@@ -290,7 +309,7 @@ RSpec.describe Thoreau::SetupAssembly do
 
       #'when `value` is block returning multiple values'        => 'returns multiple values',
       specify 'when block returns an enumerable, exposes single value as `input`' do
-        subject = Thoreau::SetupAssembly.new('desc') do
+        subject = Thoreau::SetupAssembler.new('desc') do
           [1, 2, 3]
         end
 
@@ -304,7 +323,7 @@ RSpec.describe Thoreau::SetupAssembly do
 
       #'when `value` is a proc'                                 => 'returns single value',
       specify 'when proc, exposes single value as `input`' do
-        subject = Thoreau::SetupAssembly.new('desc', -> (_) { 2 })
+        subject = Thoreau::SetupAssembler.new('desc', -> (_) { 2 })
 
         context = Object.new
         subject.setup_blocks.each { |blk| blk.call(context) }
@@ -334,7 +353,7 @@ RSpec.describe Thoreau::SetupAssembly do
             yield('three')
           end
         end
-        subject = Thoreau::SetupAssembly.new('desc', iter)
+        subject = Thoreau::SetupAssembler.new('desc', iter)
 
         setup_blocks = subject.setup_blocks
         expect(setup_blocks.size).to eq(3)
@@ -345,6 +364,21 @@ RSpec.describe Thoreau::SetupAssembly do
         expect(context.input).to eq 'three'
       end
     end
+
+    # describe 'multple' do
+    #   specify 'should run both setups' do
+    #     subject = Thoreau::SetupAssembly.new('desc', [{i:1}, {j: 2}])
+    #
+    #     setup_blocks = subject.setup_blocks
+    #     expect(setup_blocks.size).to eq(1)
+    #
+    #     context = Object.new
+    #     subject.setup_blocks.each { |blk| blk.call(context) }
+    #
+    #     expect(context.i).to eq 1
+    #     expect(context.j).to eq 2
+    #   end
+    # end
   end
 
 end
