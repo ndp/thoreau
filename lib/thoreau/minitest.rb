@@ -11,12 +11,12 @@ module Thoreau
         dsl_context.verify_config!
 
         dsl_context.each_equivalence_class do |ec|
-          describe ec.setup_key do
+          describe ec.setup_keys do
             ec.each_test do |setup_block, action_block, assertion|
               temp_context = Object.new
               setup_value  = setup_block.call(temp_context)
 
-              specify "#{ec.setup_key} #{assertion.description} when  #{setup_value.to_s.truncate(30)}" do
+              specify "#{ec.setup_keys} #{assertion.description} when  #{setup_value.to_s.truncate(30)}" do
 
                 # Transfer any variables set in the `setup` into the
                 # actual test context

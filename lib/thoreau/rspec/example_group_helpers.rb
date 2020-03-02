@@ -24,7 +24,7 @@ module Thoreau
           ec.each_test do |setup_block, action_block, assertion|
             temp_context = Object.new
             setup_value  = setup_block.call(temp_context)
-            description  = (setup_block.respond_to?(:description) ? setup_block.description : ec.setup_key.to_s)
+            description  = (setup_block.respond_to?(:description) ? setup_block.description : ec.setup_keys.to_s)
             description  += ' ' + assertion.description
 
             specify description do

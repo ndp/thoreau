@@ -3,36 +3,47 @@
 
 module Thoreau
   class EquivalenceClass
-    attr_accessor :setup_key
+    attr_accessor :setup_keys
     attr_accessor :asserts_keys
     attr_accessor :setup
     attr_accessor :action_block
     attr_accessor :assertions
 
-    def initialize(setup_key, asserts_keys)
-      @setup_key    = setup_key.to_sym
+    def initialize(setup_keys, asserts_keys)
+      @setup_keys   = Array(setup_keys).map(&:to_sym)
       @asserts_keys = [asserts_keys].flatten.map(&:to_sym)
       @assertions   = []
     end
 
     def inspect
-      "EquivalenceClass #{@setup_key} => #{@asserts_keys}"
+      "EquivalenceClass #{@setup_keys} => #{@asserts_keys}"
     end
 
     def verify_config!(setup_assemblies, assertions)
 
       warnings = ''
 
-      setup_assemblies.each do |setup|
-        @setup = setup if @setup_key == setup.key
+      missing_setups = []
+      @setup_assemblies = []
+      @setup_keys.each do |setup_key|
+        setup = setup_assemblies.find do |assembly|
+          setup_key == assembly.key
+        end
+        if setup.nil?
+          missing_setups << setup_key
+        else
+          @setup_assemblies << setup
+        end
       end
-      if @setup.nil?
+
+      if missing_setups.any?
         available_keys = setup_assemblies.map(&:description).map { |x| "`#{x}`" }.to_sentence
-        warnings << "# WARNING: Setup not defined for `#{@setup_key}` so null setup will be used. Consider adding:\n"
-        warnings << "    setup \"#{@setup_key.to_s}\" do\n"
-        warnings << "    end\n"
+        warnings << "# WARNING: Setup not defined for `#{missing_setups.join(',')}` so null setup will be used. Consider adding:\n"
+        missing_setups.each do |setup|
+          warnings << "    setup \"#{setup.to_s}\" do\n"
+          warnings << "    end\n"
+        end
         warnings << "# Available: #{available_keys}\n" unless available_keys.empty?
-        @setup = SetupAssembler.new('ec.setup_key', nil)
       end
 
       available_keys = assertions.map(&:description).map { |x| "`#{x}`" }.to_sentence
@@ -51,9 +62,11 @@ module Thoreau
     end
 
     def each_test(&block)
-      @setup.setup_blocks.each do |setup_block|
-        @assertions.each do |assertion|
-          block.call(setup_block, @action_block, assertion)
+      @setup_assemblies.each do |assembly|
+        assembly.setup_blocks.each do |setup_block|
+          @assertions.each do |assertion|
+            block.call(setup_block, @action_block, assertion)
+          end
         end
       end
     end
