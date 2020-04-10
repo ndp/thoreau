@@ -3,6 +3,10 @@
 
 A more thoughtful test framework
 
+> Testing shows the presence, not the absence of bugs. -- Edsger W. Dijkstra
+  
+
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -36,3 +40,5 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/ndp/th
 ## Code of Conduct
 
 Everyone interacting in the Thoreau project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/ndp/thoreau/blob/master/CODE_OF_CONDUCT.md).
+
+
