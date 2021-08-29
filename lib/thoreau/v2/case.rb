@@ -1,8 +1,8 @@
 module Thoreau
   module V2
     class Case
-      def initialize kind, input, action, expected_output, expected_exception
-        @kind               = kind
+      def initialize group, input, action, expected_output, expected_exception
+        @group = group
         @input              = input
         @action             = action
         @expected_output    = expected_output
@@ -11,7 +11,7 @@ module Thoreau
       end
 
       def desc
-        "#{@kind}:  #{(@input == {} ? nil : @input) || @expected_exception}"
+        "#{@group.kind}:  #{(@input == {} ? nil : @input) || @expected_exception}"
       end
 
       def problem

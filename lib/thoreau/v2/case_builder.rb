@@ -15,13 +15,16 @@ module Thoreau
 
         cases = []
 
-        @context.data.groups.each do |test_case|
-          logger.debug "Processing #{test_case}"
-          spec = test_case[:args].first || {}
+        @context.data.groups.each do |g|
+          logger.debug "Processing #{g}"
           # setup_value  = setup_block.call(temp_context)
-          inputs = spec[:inputs] || spec[:input] || {}
-          [inputs].flatten.each do |input_set|
-            c = Thoreau::V2::Case.new(test_case[:kind], input_set, @context.data.action, spec[:output], spec[:raises])
+          g.inputs.each do |input_set|
+            c = Thoreau::V2::Case.new(
+              g,
+              input_set,
+              @context.data.action,
+              g.expected_output,
+              g.expected_exception)
             cases.push(c)
           end
         end

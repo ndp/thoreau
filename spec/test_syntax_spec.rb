@@ -9,7 +9,7 @@ suite "title" do
     true
   end
 
-  happy output: true
+  happy "no arguments are required", output: true
   happy input: nil, output: true
   happy input: {}, output: true
   happy input: {a: 8}, output: true
