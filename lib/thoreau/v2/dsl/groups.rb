@@ -1,7 +1,7 @@
 module Thoreau
   module V2
     module DSL
-      class Cases
+      class Groups
 
         attr_reader :context
 
@@ -13,7 +13,7 @@ module Thoreau
           @context.logger *args
         end
 
-        include Thoreau::V2::DSL::TestCasesSupport
+        include Thoreau::V2::DSL::GroupsSupport
 
       end
 

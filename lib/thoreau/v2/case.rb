@@ -39,6 +39,10 @@ module Thoreau
         problem.nil?
       end
 
+      def failed?
+        !success?
+      end
+
       def run
         @result      = create_context.instance_exec(nil, &(@action))
       rescue Exception => e

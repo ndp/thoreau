@@ -5,10 +5,10 @@ module Thoreau
         attr_accessor :action
         attr_accessor :cases
         attr_accessor :appendix
-        attr_accessor :test_cases
+        attr_accessor :groups
 
         def initialize
-          @test_cases = []
+          @groups = []
         end
       end
 
