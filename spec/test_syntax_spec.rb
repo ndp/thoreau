@@ -1,39 +1,60 @@
 require 'thoreau/v2/dsl'
 
-
 include Thoreau::V2::DSL
 
 # A test suite has a title
-suite "title" do
+xsuite "title" do
   testing do
+    # This is some code that is run for each test
+    # It's the "subject" of the test suite. In this
+    # case we just return "true" to get things moving.
     true
   end
 
-  happy "no arguments are required", output: true
-  happy input: nil, output: true
-  happy input: {}, output: true
-  happy input: {a: 8}, output: true
+  happy output: true
+  # If tests don't work, just mark them with "fails" or "pending" and the will be "OK"
+  happy output: false, fails: true
+  happy output: false, pending: true
+
+  happy "descriptions are available", output: true
 end
 
-suite "failures" do
-  testing do
-    raise "poopy butt"
-  end
+xsuite "exceptions" do
+  testing { raise "poopy butt" }
 
   sad raises: "poopy butt"
-  sad raises: "poopy butts"
-  sad raises: Exception
+  sad raises: "poopy butts spelt wrong", fails: true
+  sad raises: Exception, fails: true
 end
 
-suite "parameters" do
-  testing do
-    a # echo back the a parameter
+xsuite "parameter" do
+  testing { a }
+
+  happy input: { a: 5 }, output: 5
+  happy input: { a: 5, z: "extra parameters are ignored" }, output: 5
+  happy "'input' can have an 's' for readability", inputs: { a: 5, b: 9 }, output: 5
+end
+
+xsuite "multiple parameters" do
+  testing { a + b }
+
+  happy 'receives both parameters', inputs: { a: 1, b: 3 }, equals: 4
+  happy 'raises if missing a parameter',
+        inputs: { a: 2 }, fails: true
+end
+
+suite "shared setup blocks" do
+  testing { a }
+
+  happy "when a is 5", setup: "a_is_5", output: 5
+  happy "a_is_5", output: 5
+  happy "a_is_7", output: 7
+
+  appendix do
+    setup "a_is_5", { a: 5 }
+    setup("a_is_7") { a = 7 }
   end
-
-  happy input: { a: 5 }, output: 6
-  happy inputs: { a: 5 }, output: 5, desc: '"inputs" can be plural'
 end
-
 
 def gcd(a, b)
   if (a == 0)
@@ -51,9 +72,7 @@ def gcd(a, b)
   return a
 end
 
-include Thoreau::V2::DSL
-
-suite do
+xsuite do
   testing do
     gcd(a, b)
   end

@@ -2,7 +2,7 @@ module Thoreau
   module V2
 
     class SpecGroup
-      attr_reader :kind, :desc, :args
+      attr_reader :kind, :desc
 
       def initialize(kind:, desc:, spec:)
         @kind = kind
@@ -15,11 +15,15 @@ module Thoreau
       end
 
       def expected_output
-        @spec[:output]
+        @spec[:output] || @spec[:equals] || @spec[:equal]
       end
 
       def expected_exception
         @spec[:raises]
+      end
+
+      def failure_expected?
+        @spec[:pending] || @spec[:fails]
       end
     end
   end

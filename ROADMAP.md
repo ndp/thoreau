@@ -1,3 +1,19 @@
+## TODOs
+
+[ ] focus on suite with a bang "suite!"
+
+[ ] Shared setups
+[ ] focus on tests with a bang "happy!"
+[ ] More assertions / flexible evaluation
+[ ] Multiple inputs support
+[ ] Legacy support
+[ ] Formatters for reporting
+[ ] EXIT code 1 if failures
+[ ] complains if there's more than one testing block
+[ ] complains if there are no tests
+
+
+
 # DSL Improvements
 * [ ] remove rspec generate!
 * [ ] allows nil setup
@@ -76,3 +92,27 @@ These three artifacts are related:
 * Requirements/Tests: BDD, Cucumber, [Fit](http://fit.c2.com/wiki.cgi?FitWorkflow)
 * Tests/Documentation:  Relish
 * Testing the Documentation: test-pantry
+
+
+# IDEAS
+
+Deal with testing legacy apps. One would like to brainstorm setup 
+scenarios and simply assert that they "never change". This requires
+the creating of snapshots (or equivalent), but would be be useful
+when not TDDing.
+
+Design a tool for non-TDD. 
+Q. How do I write tests for this existing app?
+A. A simple answer is 
+   1. identify equivalence classes of inputs
+   2. record and assert that the values remain the same
+
+
+# DSL ideas:
+
+`invariant`
+`edge`
+`define`
+
+define 'output of foo()' => :frozen
+

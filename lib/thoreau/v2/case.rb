@@ -1,3 +1,5 @@
+require 'active_support/core_ext/module/delegation'
+
 module Thoreau
   module V2
     class Case
@@ -10,8 +12,10 @@ module Thoreau
         @ran                = false
       end
 
+      delegate :failure_expected?, to: :@group
+
       def desc
-        "#{@group.kind}:  #{(@input == {} ? nil : @input) || @expected_exception}"
+        "#{@group.kind}:  #{@group.desc} #{(@input == {} ? nil : @input) || @expected_exception || "(no arguments here)"}"
       end
 
       def problem
@@ -21,12 +25,14 @@ module Thoreau
             nil
           elsif @raised_exception.nil?
             "Expected exception, but none raised"
+          elsif @raised_exception.is_a?(NameError)
+            "Did you forget to define an input? Error: #{@raised_exception}"
           else
-            "Expected #{@raised_exception} exception, but raised #{@expected_exception}"
+            "Expected '#{@expected_exception}' exception, but raised '#{@raised_exception}' (#{@raised_exception.class.name})"
           end
         else
           if @raised_exception
-            "Expected output, but raised exception #{@raised_exception}"
+            "Expected output, but raised exception '#{@raised_exception}'"
           elsif @expected_output != @result
             "Expected '#{@expected_output}', but got '#{@result}'"
           else
@@ -36,7 +42,7 @@ module Thoreau
       end
 
       def success?
-        problem.nil?
+        problem.nil? || failure_expected?
       end
 
       def failed?

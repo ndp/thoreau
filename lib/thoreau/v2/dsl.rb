@@ -34,7 +34,11 @@ module Thoreau
         runner.run_test_cases! builder.build_test_cases!
       end
 
+      def xtest_suite name = nil, &block
+      end
+
       alias suite test_suite
+      alias xsuite xtest_suite
 
       include Thoreau::V2::DSL::GroupsSupport
 

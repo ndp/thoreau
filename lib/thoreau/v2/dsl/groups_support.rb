@@ -14,6 +14,7 @@ module Thoreau
             if args.size > 1 && args.first.is_a?(String)
               desc = args.shift
             end
+            raise "Too many arguments to #{sym}!" if args.size > 1
             group = SpecGroup.new(kind: sym, desc: desc, spec: args.first || {})
             logger.debug "Adding group #{group}"
             context.data.groups.push(group)
