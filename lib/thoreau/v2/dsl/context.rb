@@ -17,11 +17,13 @@ module Thoreau
         attr_reader :data
         attr_reader :name
         attr_reader :logger
+        attr_reader :setups
 
         def initialize name, logger
           @name   = name
           @logger = logger
           @data   = Data.new
+          @setups = {}
         end
 
         def action(&block)

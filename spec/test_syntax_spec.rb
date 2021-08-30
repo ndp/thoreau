@@ -1,9 +1,9 @@
-require 'thoreau/v2/dsl'
+require 'thoreau'
 
 include Thoreau::V2::DSL
 
 # A test suite has a title
-xsuite "title" do
+suite "title" do
   testing do
     # This is some code that is run for each test
     # It's the "subject" of the test suite. In this
@@ -19,7 +19,7 @@ xsuite "title" do
   happy "descriptions are available", output: true
 end
 
-xsuite "exceptions" do
+suite "exceptions" do
   testing { raise "poopy butt" }
 
   sad raises: "poopy butt"
@@ -27,7 +27,7 @@ xsuite "exceptions" do
   sad raises: Exception, fails: true
 end
 
-xsuite "parameter" do
+suite "parameter" do
   testing { a }
 
   happy input: { a: 5 }, output: 5
@@ -35,7 +35,7 @@ xsuite "parameter" do
   happy "'input' can have an 's' for readability", inputs: { a: 5, b: 9 }, output: 5
 end
 
-xsuite "multiple parameters" do
+suite "multiple parameters" do
   testing { a + b }
 
   happy 'receives both parameters', inputs: { a: 1, b: 3 }, equals: 4
@@ -44,16 +44,26 @@ xsuite "multiple parameters" do
 end
 
 suite "shared setup blocks" do
-  testing { a }
+  testing { a + (respond_to?(:b) ? b : 0) }
 
-  happy "when a is 5", setup: "a_is_5", output: 5
-  happy "a_is_5", output: 5
-  happy "a_is_7", output: 7
+  happy "when a is 5", setup: "a=5", output: 5
+  # happy "a=5", output: 5 # if the name is the setup, use it
+  happy setup: "a=7", output: 7
+  happy 'can have multiple setups', setups: ['a=7', 'b=3'] , output: 10
 
   appendix do
-    setup "a_is_5", { a: 5 }
-    setup("a_is_7") { a = 7 }
+    setup "a=5", { a: 5 }
+    setup("a=7") { { a: 7 } } # proc that returns a value
+    setup "b=3", { b: 3 }
   end
+end
+
+suite "expectation blocks" do
+  testing { 3 }
+
+  happy "expect a block", output: proc { | result | result == 3 }
+  happy "block must be truthy", output: proc { | _ | false }, fails: true
+  happy "runs assertions", output: proc { | result | result == 42 }, fails: true
 end
 
 def gcd(a, b)
@@ -72,7 +82,7 @@ def gcd(a, b)
   return a
 end
 
-xsuite do
+suite do
   testing do
     gcd(a, b)
   end

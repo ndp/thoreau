@@ -1,8 +1,9 @@
 ## TODOs
 
-[ ] focus on suite with a bang "suite!"
-
-[ ] Shared setups
+[x] focus on suite with a bang "suite!"
+[ ] take to right line of code with better output
+[X] Shared setups
+[x] dynamic expects blocks
 [ ] focus on tests with a bang "happy!"
 [ ] More assertions / flexible evaluation
 [ ] Multiple inputs support

@@ -22,6 +22,10 @@ module Thoreau
         @spec[:raises]
       end
 
+      def setups
+        [@spec[:setup], @spec[:setups]].flatten.compact
+      end
+
       def failure_expected?
         @spec[:pending] || @spec[:fails]
       end

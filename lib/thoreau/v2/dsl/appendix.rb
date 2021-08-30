@@ -13,6 +13,11 @@ module Thoreau
 
         end
 
+        def setup name, values = {}, &block
+          raise "duplicate setup block #{name}" unless @context.setups[name].nil?
+          @context.setups[name.to_s] = [values, block]
+        end
+
         def outputs
 
         end

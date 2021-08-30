@@ -1,14 +1,17 @@
 require 'active_support/core_ext/module/delegation'
+require_relative './case_context_builder'
 
 module Thoreau
   module V2
     class Case
-      def initialize group, input, action, expected_output, expected_exception
+      def initialize group:, input:, action:, expected_output:, expected_exception:, logger:, suite_context:
         @group = group
         @input              = input
         @action             = action
         @expected_output    = expected_output
         @expected_exception = expected_exception
+        @logger = logger
+        @suite_context = suite_context
         @ran                = false
       end
 
@@ -33,6 +36,8 @@ module Thoreau
         else
           if @raised_exception
             "Expected output, but raised exception '#{@raised_exception}'"
+          elsif @expected_output.is_a?(Proc)
+            @post_condition_result ? nil : "Expected '#{@post_condition_result}', but got '#{@result}'"
           elsif @expected_output != @result
             "Expected '#{@expected_output}', but got '#{@result}'"
           else
@@ -41,31 +46,26 @@ module Thoreau
         end
       end
 
-      def success?
+      def ok?
         problem.nil? || failure_expected?
       end
 
       def failed?
-        !success?
+        !ok?
       end
 
       def run
-        @result      = create_context.instance_exec(nil, &(@action))
+        logger.debug("create_context for #{desc}")
+        context_builder = CaseContextBuilder.new(setups: @suite_context.setups, group: @group, input: @input)
+        context  = context_builder.create_context
+        @result      = context.instance_exec(nil, &(@action))
+        @post_condition_result = context.instance_exec(@result, &(@expected_output)) if @expected_output.is_a?(Proc)
       rescue Exception => e
         @raised_exception = e
       ensure
         @ran = true
       end
 
-      def create_context
-        temp_context = Class.new.new
-        @input.each do |lval, rval|
-          temp_context.instance_variable_set("@#{lval}", rval)
-          temp_context.class.attr_accessor lval
-        end
-        temp_context
-      end
     end
-
   end
 end

@@ -13,13 +13,13 @@ module Thoreau
       def run_test_cases! cases
         logger.info "# #{@context.name || "Test Suite"}"
         cases.each do |c|
-          if c.success?
-            logger.info " OK     #{c.desc}"
+          if c.ok?
+            logger.info " OK      #{c.desc}"
           else
-            logger.error "FAILED #{c.desc}, #{c.problem}"
+            logger.error "PROBLEM #{c.desc}, #{c.problem}"
           end
         end
-        logger.info "... #{cases.count(&:success?)} passed, #{cases.count(&:failed?)} failed."
+        logger.info "... #{cases.count(&:ok?)} OK, #{cases.count(&:failed?)} problem(s)."
         logger.info ""
 
       end

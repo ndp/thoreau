@@ -16,15 +16,16 @@ module Thoreau
         cases = []
 
         @context.data.groups.each do |g|
-          logger.debug "Processing #{g}"
           # setup_value  = setup_block.call(temp_context)
           g.inputs.each do |input_set|
             c = Thoreau::V2::Case.new(
-              g,
-              input_set,
-              @context.data.action,
-              g.expected_output,
-              g.expected_exception)
+              group: g,
+              input: input_set,
+              action: @context.data.action,
+              expected_output: g.expected_output,
+              expected_exception: g.expected_exception,
+              suite_context: @context,
+              logger: logger)
             cases.push(c)
           end
         end
