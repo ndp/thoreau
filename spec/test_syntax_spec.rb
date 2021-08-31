@@ -3,7 +3,7 @@ require 'thoreau'
 include Thoreau::V2::DSL
 
 # A test suite has a title
-suite "title" do
+suite "simplest tests" do
   testing do
     # This is some code that is run for each test
     # It's the "subject" of the test suite. In this
@@ -11,12 +11,15 @@ suite "title" do
     true
   end
 
-  happy output: true
-  # If tests don't work, just mark them with "fails" or "pending" and the will be "OK"
-  happy output: false, fails: true
-  happy output: false, pending: true
+  happy "output matches result of test block", output: true
+  happy "output equals result of test block", equals: true # same thing
 
-  happy "descriptions are available", output: true
+  # If tests don't work, just mark them with "fails" or "pending" and the will be "OK"
+  happy "tests marked 'fails' must fail", output: false, fails: true
+  happy "tests marked 'pending' must fail", output: false, pending: true
+
+  happy "tests can have doescriptions", output: true
+  happy output: true # or not
 end
 
 suite "exceptions" do
@@ -24,23 +27,23 @@ suite "exceptions" do
 
   sad raises: "poopy butt"
   sad raises: "poopy butts spelt wrong", fails: true
-  sad raises: Exception, fails: true
+  sad "wrong exception type", raises: Exception, fails: true
 end
 
 suite "parameter" do
   testing { a }
 
-  happy input: { a: 5 }, output: 5
-  happy input: { a: 5, z: "extra parameters are ignored" }, output: 5
+  happy "input parameter passes to test block", input: { a: 5 }, output: 5
   happy "'input' can have an 's' for readability", inputs: { a: 5, b: 9 }, output: 5
 end
 
 suite "multiple parameters" do
   testing { a + b }
 
-  happy 'receives both parameters', inputs: { a: 1, b: 3 }, equals: 4
+  happy 'receives both params', inputs: { a: 1, b: 3 }, equals: 4
   happy 'raises if missing a parameter',
         inputs: { a: 2 }, fails: true
+  happy 'extra params are ignored', input: { a: 5, b: 7, z: "ignored" }, output: 12
 end
 
 suite "shared setup blocks" do
@@ -48,7 +51,7 @@ suite "shared setup blocks" do
 
   happy "when a is 5", setup: "a=5", output: 5
   # happy "a=5", output: 5 # if the name is the setup, use it
-  happy setup: "a=7", output: 7
+  happy setup: "a=7", output: 7 # very concise test
   happy 'can have multiple setups', setups: ['a=7', 'b=3'] , output: 10
 
   appendix do
@@ -74,56 +77,6 @@ suite "input generators" do
   testing { i*i }
 
   happy inputs: { i: Enumerator.new([-1,0,1,100,1_000_000]) },
-        equals: (proc do |result|
-    i * i
-  end)
-end
-
-def gcd(a, b)
-  if (a == 0)
-    return b
-  end
-
-  while b != 0
-    if a > b
-      a = a - b
-    else
-      b = b - a;
-    end
-  end
-
-  return a
-end
-
-suite do
-  testing do
-    gcd(a, b)
-  end
-
-  cases do
-    happy inputs: { a: 12, b: 9 }, output: 3
-    happy inputs: { a: 9, b: 12 }, output: 3
-    happy inputs: [{ a: 10, b: 9 }, { a: 10, b: 9 }], output: 1
-    happy inputs: { a: 100, b: 25 }, output: 25
-
-    # edges :none
-
-    boundary inputs: { a: 0, b: 0 }, output: 0
-    boundary inputs: { a: 1, b: 1 }, output: 1
-    boundary inputs: { a: 0, b: 100 }, output: 100
-    boundary inputs: { a: 100, b: 0 }, output: 100
-
-    corner inputs: { a: 1, b: 100 }, output: 1
-  end
-
-  appendix do
-    inputs # what are the inputs we care about
-
-    setups # what are commend set-up scenarios
-
-    outputs # what are the outputs we care about
-
-    expectations
-  end
+        equals: (proc { |result| i * i })
 end
 

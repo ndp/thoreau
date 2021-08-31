@@ -1,13 +1,13 @@
 ## TODOs
 
 [x] focus on suite with a bang "suite!"
-[ ] take to right line of code with better output
-[X] Shared setups
+[x] Shared setups
 [x] dynamic expects blocks
+[x] Multiple inputs support
 [ ] focus on tests with a bang "happy!"
-[ ] More assertions / flexible evaluation
-[ ] Multiple inputs support
 [ ] Legacy support
+[ ] take to right line of code with better output
+[ ] More assertions / flexible evaluation
 [ ] Formatters for reporting
 [ ] EXIT code 1 if failures
 [ ] complains if there's more than one testing block
