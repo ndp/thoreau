@@ -31,7 +31,7 @@ module Thoreau
         if failed == 0
           "  ∴ All OK 👌🏾 #{skipped > 0 ? "#{skipped} skipped." : ""}"
         else
-          " 🛑  #{failed} problem(s)            [#{ok} of #{total} OK#{skipped > 0 ? ", #{skipped} skipped" : ""}.]"
+          " 🛑  #{failed} problem(s) detected.  [#{ok} of #{total} OK#{skipped > 0 ? ", #{skipped} skipped" : ""}.]"
         end
 
       end

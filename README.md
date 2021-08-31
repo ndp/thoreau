@@ -40,6 +40,27 @@ suite "dumbist" do
   happy "descriptions if you want", output: true
 end
 ```
+
+## Why
+For data-driven or black-box testing, two things are important:
+- easily provide a range of inputs
+- identify and utilize "equivalence classes" of data
+Our current testing frameworks do nothing to support this.
+
+The current testing frameworks are written by developers and have a 
+sequential, programmatic approach, even though it is sometimes obscured
+a bit by the words "spec" and "be". We are still thinking very
+much step-by-step in constructing tests. But what we have learned from
+other programming paradigms, like declarative and functional programming,
+is the value of letting go to these steps.
+
+Thoreau attempts to present a new paradigm, from the perspective of
+a tester.
+
+As an expert in testing, I've been able to level up, and use code coverage
+and branch/logic coverage tools to improve my tests. But these white-box
+techniques are limited in the range of bugs they will find, and 
+
 ## Features:
 * organize tests into suites with common setups and subject
 * name your test based on the type of test, eg. happy sad spec edge edges boundary corner gigo

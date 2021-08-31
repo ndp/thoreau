@@ -66,17 +66,19 @@ module Thoreau
 
       def run
         logger.debug("create_context for #{desc}")
-        context_builder        = CaseContextBuilder.new(setups: @suite_context.setups, group: @group, input: @input)
-        context                = context_builder.create_context
-
-        @result                = context.instance_exec(nil, &(@action))
+        context_builder = CaseContextBuilder.new(setups: @suite_context.setups, group: @group, input: @input)
+        context         = context_builder.create_context
+        begin # Only capture exceptions around the action itself.
+          @result = context.instance_exec(&(@action))
+        rescue Exception => e
+          @raised_exception = e
+          return
+        ensure
+          @ran = true
+        end
 
         @assert_result         = context.instance_exec(@result, &(@asserts)) if @asserts
         @post_condition_result = context.instance_exec(@result, &(@expected_output)) if @expected_output.is_a?(Proc)
-      rescue Exception => e
-        @raised_exception = e
-      ensure
-        @ran = true
       end
 
     end
