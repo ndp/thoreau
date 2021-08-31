@@ -23,8 +23,8 @@ module Thoreau
         @logger      = Logger.new(STDOUT, formatter: proc { |severity, datetime, progname, msg|
           "#{severity}: #{msg}\n"
         })
-        logger.level = Logger::DEBUG
         logger.level = Logger::INFO
+        logger.level = Logger::DEBUG if ENV['DEBUG']
 
         @context = Thoreau::V2::DSL::Context.new(name, @logger)
 
