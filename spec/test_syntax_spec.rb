@@ -82,3 +82,16 @@ suite "input generators" do
         equals: (proc { |result| i * i })
 end
 
+suite 'appendix' do
+
+  appendix do
+    inputs # what are the inputs we care about
+
+    setups # what are commend set-up scenarios
+
+    outputs # what are the outputs we care about
+
+    expectations
+  end
+
+end

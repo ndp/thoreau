@@ -1,31 +1,21 @@
 ## TODOs
 
-[x] focus on suite with a bang "suite!"
-[x] Shared setups
-[x] dynamic expects blocks
-[x] Multiple inputs support
-[ ] focus on tests with a bang "happy!"
-[ ] Legacy support
-[ ] take to right line of code with better output
-[ ] More assertions / flexible evaluation
-[ ] Formatters for reporting
-[ ] EXIT code 1 if failures
-[ ] complains if there's more than one testing block
-[ ] complains if there are no tests
-
-
-
-# DSL Improvements
-* [ ] remove rspec generate!
-* [ ] allows nil setup
-* [ ] fails if no assertion
-* [ ] complains if more than one setup with the same name
-* [ ] complains if more than one action
-* [ ] complains if more than one asserts with the same name
+* [x] focus on suite with a bang "suite!"
+* [x] Shared setups
+* [x] dynamic expects blocks
+* [x] Multiple inputs support
+* [x] focus on tests with a bang "happy!"
+* [ ] Legacy support
+* [ ] take to right line of code with better output
+* [ ] More assertions / flexible evaluation
+* [ ] Formatters for reporting
+* [ ] EXIT code 1 if failures
+* [ ] complains if there's more than one testing block
+* [ ] complains if there are no tests
+* [ ] what to do with a test with no expectations
 * [ ] warns about unused setups
 * [ ] warns about unused asserts
-* [ ] create [minitest plugin?](https://github.com/fteem/how-to-write-minitest-extensions/blob/master/manuscript/4-writing-our-first-extension.md#adding-the-plugin) 
-
+* [ ] create [minitest plugin?](https://github.com/fteem/how-to-write-minitest-extensions/blob/master/manuscript/4-writing-our-first-extension.md#adding-the-plugin)
 
 ## Glossary
 Test Case. What the QA engineer references to determine if a feature performs its function as expected. ...
