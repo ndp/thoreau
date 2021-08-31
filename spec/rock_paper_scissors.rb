@@ -45,6 +45,7 @@ test_suite "winners and losers" do
 end
 
 test_suite "matching values" do
+
   subject { rock_paper_scissors(a, a) } # note "a" and "a"
 
   happy "matching inputs tie",

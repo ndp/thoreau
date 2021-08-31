@@ -14,7 +14,7 @@ module Thoreau
         logger.info "  § #{@context.name} §"
         cases.each do |c|
           if c.ok?
-            logger.info " 👌🏾 #{c.desc}"
+            logger.info "  ✓ #{c.desc}"
           else
             logger.error "❓ #{c.desc}, #{c.problem}"
           end
@@ -29,7 +29,7 @@ module Thoreau
         total  = cases.count
         failed = cases.count(&:failed?)
         if failed == 0
-          " ∴ All OK 👌🏾"
+          "  ∴ All OK 👌🏾"
         else
           " 🛑  #{failed} problem(s)            [#{ok} of #{total} OK]"
         end

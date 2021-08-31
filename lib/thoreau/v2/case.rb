@@ -26,7 +26,7 @@ module Thoreau
       delegate :failure_expected?, to: :@group
 
       def desc
-        "#{@group.kind}:  #{@group.desc} #{(@input == {} ? nil : @input) || @expected_exception || "(no args)"}"
+        "#{@group.kind}:  #{@group.desc} #{(@input == {} ? nil : @input.sort.to_h) || @expected_exception || "(no args)"}"
       end
 
       def problem
