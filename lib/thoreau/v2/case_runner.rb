@@ -16,7 +16,7 @@ module Thoreau
           if c.ok?
             logger.info " 👌🏾 #{c.desc}"
           else
-            logger.error "⚠️ #{c.desc}, #{c.problem}"
+            logger.error "⚠️  #{c.desc}, #{c.problem}"
           end
         end
         logger.info "... #{cases.count(&:ok?)} OK, #{cases.count(&:failed?)} problem(s)."

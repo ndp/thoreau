@@ -11,11 +11,18 @@ module Thoreau
         # Note: requires `logger` and `context`.
         SPEC_GROUP_NAMES.each do |sym|
           define_method sym do |*args|
-            if args.size > 1 && args.first.is_a?(String)
-              desc = args.shift
-            end
+            desc = args.shift if args.size > 1 && args.first.is_a?(String)
             raise "Too many arguments to #{sym}!" if args.size > 1
-            group = SpecGroup.new(kind: sym, desc: desc, spec: args.first || {})
+
+            spec  = args.first || {}
+            group = SpecGroup.new asserts:            spec[:assert] || spec[:asserts],
+                                  desc:               desc,
+                                  expected_exception: spec[:raises],
+                                  expected_output:    spec[:output] || spec[:equals] || spec[:equal] || spec[:expected],
+                                  failure_expected:   spec[:pending] || spec[:fails],
+                                  input_specs:        [spec[:inputs] || spec[:input] || {}].flatten,
+                                  kind:               sym,
+                                  setups:             [spec[:setup], spec[:setups]].flatten.compact
             logger.debug "Adding group #{group}"
             context.data.groups.push(group)
           end
