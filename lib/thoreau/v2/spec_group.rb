@@ -9,6 +9,7 @@ module Thoreau
                   :input_specs,
                   :kind,
                   :setups
+      attr_writer :focus
 
       def initialize(asserts:,
                      desc:,
@@ -32,6 +33,11 @@ module Thoreau
       def failure_expected?
         @failure_expected
       end
+
+      def focused?
+        @focus
+      end
+
     end
   end
 end

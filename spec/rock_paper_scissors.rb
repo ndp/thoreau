@@ -51,7 +51,7 @@ test_suite "matching values" do
   happy "matching inputs tie",
         inputs: [{ a: 'rock' }, { a: 'paper' }, { a: 'scissors' }],
         equals: :tie
-  happy "matchig inputs tie (enumerator)",
+  happy "matching inputs tie (enumerator)",
         inputs: { a: Enumerator.new(['rock', 'paper', 'scissors']) },
         equals: :tie
 end

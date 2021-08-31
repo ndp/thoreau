@@ -1,5 +1,6 @@
 require 'logger'
 
+require 'thoreau/v2/test_suite'
 require 'thoreau/v2/case'
 require 'thoreau/v2/case_builder'
 require 'thoreau/v2/case_runner'
@@ -14,44 +15,6 @@ end
 
 module Thoreau
   module V2
-
-    class TestSuite
-
-      attr_reader :name
-      attr_reader :logger
-
-      @@suites = []
-
-      def initialize(context:, logger:, name:, focus:)
-        @context = context
-        @logger  = logger
-        @name    = name
-        @focus   = focus
-        @@suites << self
-      end
-
-      def build_and_run
-        builder = Thoreau::V2::CaseBuilder.new @context
-        runner  = Thoreau::V2::CaseRunner.new @context
-        runner.run_test_cases! builder.build_test_cases!
-      end
-
-      def focused?
-        @focus
-      end
-
-      def self.run_all!
-        run_all = !@@suites.any?(&:focused?)
-        @@suites.each do |suite|
-          if suite.focused? || run_all
-            suite.build_and_run
-          else
-            suite.logger.info("Suite '#{suite.name}' skipped (unfocused)")
-          end
-        end
-      end
-    end
-
     module DSL
 
       attr_reader :logger

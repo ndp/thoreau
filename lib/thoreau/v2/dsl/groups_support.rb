@@ -25,6 +25,13 @@ module Thoreau
                                   setups:             [spec[:setup], spec[:setups]].flatten.compact
             logger.debug "Adding group #{group}"
             context.data.groups.push(group)
+            group
+          end
+
+          define_method "#{sym}!" do |*args|
+            group = self.send(sym, *args)
+            group.focus = true
+            group
           end
         end
       end

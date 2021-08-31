@@ -10,12 +10,24 @@ module Thoreau
         @context.logger
       end
 
+      def any_focused?
+        @context.data.groups.count(&:focused?) > 0
+      end
+
+      def skipped_count
+        return 0 unless any_focused?
+        @context.data.groups.count - @context.data.groups.count(&:focused?)
+      end
+
       def build_test_cases!
         logger.debug "build_test_cases!"
 
         cases = []
 
-        @context.data.groups.each do |g|
+        @context.data
+                .groups
+                .select { |g| any_focused? && g.focused? || !any_focused? }
+                .each do |g|
 
           # We have some generic "specs" for the inputs,
           # and we need to "explode" (or enumerate) the values,

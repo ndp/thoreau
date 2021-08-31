@@ -10,7 +10,7 @@ module Thoreau
         @context.logger
       end
 
-      def run_test_cases! cases
+      def run_test_cases! cases, skipped
         logger.info "  § #{@context.name} §"
         cases.each do |c|
           if c.ok?
@@ -19,19 +19,19 @@ module Thoreau
             logger.error "❓ #{c.desc}, #{c.problem}"
           end
         end
-        logger.info (summary cases)
+        logger.info (summary cases, skipped)
         logger.info ""
 
       end
 
-      def summary cases
+      def summary cases, skipped
         ok     = cases.count(&:ok?)
         total  = cases.count
         failed = cases.count(&:failed?)
         if failed == 0
-          "  ∴ All OK 👌🏾"
+          "  ∴ All OK 👌🏾 #{skipped > 0 ? "#{skipped} skipped." : ""}"
         else
-          " 🛑  #{failed} problem(s)            [#{ok} of #{total} OK]"
+          " 🛑  #{failed} problem(s)            [#{ok} of #{total} OK#{skipped > 0 ? ", #{skipped} skipped" : ""}.]"
         end
 
       end
