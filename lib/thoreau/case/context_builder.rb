@@ -1,6 +1,6 @@
 module Thoreau
-  module V2
-    class CaseContextBuilder
+  class Case
+    class ContextBuilder
 
       def initialize(setups:, group:, input:)
         @suite_setups = setups

@@ -1,6 +1,6 @@
 require 'thoreau'
 
-include Thoreau::V2::DSL
+include Thoreau::DSL
 
 # A test suite has a title
 suite "simplest tests" do

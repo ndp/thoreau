@@ -1,6 +1,6 @@
 require 'thoreau'
 
-include Thoreau::V2::DSL
+include Thoreau::DSL
 
 def rock_paper_scissors(a, b)
   return :tie if a == b

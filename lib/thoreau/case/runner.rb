@@ -1,6 +1,6 @@
 module Thoreau
-  module V2
-    class CaseRunner
+  class Case
+    class Runner
 
       def initialize(context)
         @context = context

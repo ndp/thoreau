@@ -1,5 +1,5 @@
 require_relative 'thoreau/version'
-require_relative 'thoreau/v2/dsl'
+require_relative 'thoreau/dsl'
 
 module Thoreau
   class Error < StandardError;

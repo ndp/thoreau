@@ -28,9 +28,9 @@ Or install it yourself as:
 TODO: Write usage instructions here
 
 ```ruby
-require 'thoreau/v2/dsl'
+require 'thoreau/dsl'
 
-include Thoreau::V2::DSL
+include Thoreau::DSL
 
 suite "dumbist" do
   testing { true }

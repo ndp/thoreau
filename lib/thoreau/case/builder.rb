@@ -1,6 +1,6 @@
 module Thoreau
-  module V2
-    class CaseBuilder
+  class Case
+    class Builder
 
       def initialize(context)
         @context = context
@@ -37,7 +37,7 @@ module Thoreau
           end
 
           input_sets.each do |input_set|
-            c = Thoreau::V2::Case.new(
+            c = Thoreau::Case.new(
               group:              g,
               input:              input_set,
               action:             @context.data.action,

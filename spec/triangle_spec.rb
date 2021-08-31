@@ -1,6 +1,6 @@
 require 'thoreau'
 
-include Thoreau::V2::DSL
+include Thoreau::DSL
 
 def triangle_type(a, b, c)
   return 'error' unless a.is_a?(Numeric)
