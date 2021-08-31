@@ -52,7 +52,7 @@ suite "shared setup blocks" do
   happy "when a is 5", setup: "a=5", output: 5
   # happy "a=5", output: 5 # if the name is the setup, use it
   happy setup: "a=7", output: 7 # very concise test
-  happy 'can have multiple setups', setups: ['a=7', 'b=3'] , output: 10
+  happy 'can have multiple setups', setups: ['a=7', 'b=3'], output: 10
 
   appendix do
     setup "a=5", { a: 5 }
@@ -64,19 +64,21 @@ end
 suite "expectation blocks" do
   testing { 3 }
 
-  happy "runs assertion block", asserts: proc { | result | result == 3 }
-  happy "runs assertions (negative case)", asserts: proc { | result | result == 42 }, fails: true
-  happy "block must be truthy", asserts: proc { | _ | true }
-  happy "block must be truthy (negative case)", asserts: proc { | _ | false }, fails: true
+  happy "runs assertion block", asserts: proc { |result| result == 3 }
+  happy "runs assertions (negative case)", asserts: proc { |result| result == 42 }, fails: true
+  happy "block must be truthy", asserts: proc { |_| true }
+  happy "block must be truthy (negative case)", asserts: proc { |_| false }, fails: true
 
   happy "tests equivalence of proc result", equals: proc { 3 }
-  happy "tests equivalence of proc result (negative case)", equals: proc { 5 }, fails: true
+  happy "tests equivalence of proc result (negative case)",
+        equals: proc { 5 },
+        fails:  true
 end
 
 suite "input generators" do
-  testing { i*i }
+  testing { i * i }
 
-  happy inputs: { i: Enumerator.new([-1,0,1,100,1_000_000]) },
+  happy inputs: { i: Enumerator.new([-1, 0, 1, 100, 1_000_000]) },
         equals: (proc { |result| i * i })
 end
 
