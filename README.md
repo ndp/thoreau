@@ -40,7 +40,11 @@ suite "dumbist" do
   happy "descriptions if you want", output: true
 end
 ```
-
+## Features:
+* organize tests into suites with common setups and subject
+* name your test based on the type of test, eg. happy sad spec edge edges boundary corner gigo
+* simple assertions written in nature Ruby code (you write them yourself).
+* focus on specific tests using an exclamation point, eg. `suite!` or `spec!`
 
 
 

@@ -61,9 +61,22 @@ end
 suite "expectation blocks" do
   testing { 3 }
 
-  happy "expect a block", output: proc { | result | result == 3 }
-  happy "block must be truthy", output: proc { | _ | false }, fails: true
-  happy "runs assertions", output: proc { | result | result == 42 }, fails: true
+  happy "runs assertion block", asserts: proc { | result | result == 3 }
+  happy "runs assertions (negative case)", asserts: proc { | result | result == 42 }, fails: true
+  happy "block must be truthy", asserts: proc { | _ | true }
+  happy "block must be truthy (negative case)", asserts: proc { | _ | false }, fails: true
+
+  happy "tests equivalence of proc result", equals: proc { 3 }
+  happy "tests equivalence of proc result (negative case)", equals: proc { 5 }, fails: true
+end
+
+suite "input generators" do
+  testing { i*i }
+
+  happy inputs: { i: Enumerator.new([-1,0,1,100,1_000_000]) },
+        equals: (proc do |result|
+    i * i
+  end)
 end
 
 def gcd(a, b)

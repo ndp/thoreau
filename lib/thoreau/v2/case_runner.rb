@@ -14,9 +14,9 @@ module Thoreau
         logger.info "# #{@context.name || "Test Suite"}"
         cases.each do |c|
           if c.ok?
-            logger.info " OK      #{c.desc}"
+            logger.info " 👌🏾 #{c.desc}"
           else
-            logger.error "PROBLEM #{c.desc}, #{c.problem}"
+            logger.error "⚠️ #{c.desc}, #{c.problem}"
           end
         end
         logger.info "... #{cases.count(&:ok?)} OK, #{cases.count(&:failed?)} problem(s)."

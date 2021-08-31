@@ -10,12 +10,16 @@ module Thoreau
         @spec = spec
       end
 
-      def inputs
+      def input_specs
         [@spec[:inputs] || @spec[:input] || {}].flatten
       end
 
       def expected_output
-        @spec[:output] || @spec[:equals] || @spec[:equal]
+        @spec[:output] || @spec[:equals] || @spec[:equal] || @spec[:expected]
+      end
+
+      def asserts
+        @spec[:assert] || @spec[:asserts]
       end
 
       def expected_exception

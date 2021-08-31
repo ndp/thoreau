@@ -16,16 +16,24 @@ module Thoreau
         cases = []
 
         @context.data.groups.each do |g|
-          # setup_value  = setup_block.call(temp_context)
-          g.inputs.each do |input_set|
+
+          # We have some generic "specs" for the inputs,
+          # and we need to "explode" (or enumerate) the values,
+          # generating a single test for each combination.
+          input_sets = g.input_specs.flat_map do |input_spec|
+            explode_input_specs(input_spec.keys, input_spec)
+          end
+
+          input_sets.each do |input_set|
             c = Thoreau::V2::Case.new(
-              group: g,
-              input: input_set,
-              action: @context.data.action,
-              expected_output: g.expected_output,
+              group:              g,
+              input:              input_set,
+              action:             @context.data.action,
+              expected_output:    g.expected_output,
               expected_exception: g.expected_exception,
-              suite_context: @context,
-              logger: logger)
+              asserts:            g.asserts,
+              suite_context:      @context,
+              logger:             logger)
             cases.push(c)
           end
         end
@@ -33,7 +41,31 @@ module Thoreau
         cases
       end
 
-    end
+      private
 
+      # Expand any values that are enumerators, creating a list of
+      # objects, where all the combinations of enumerated values are provided.
+      def explode_input_specs(keys, input_spec)
+        k = keys.pop
+
+        value_spec = input_spec[k]
+        specs      = if value_spec.is_a?(Enumerator)
+                       value_spec.map do |v|
+                         input_spec.merge(k => v)
+                       end
+                     else
+                       [input_spec]
+                     end
+
+        # Are we done?
+        return specs if keys.empty?
+
+        specs.flat_map do |spec|
+          explode_input_specs(keys, spec)
+        end
+
+      end
+
+    end
   end
 end

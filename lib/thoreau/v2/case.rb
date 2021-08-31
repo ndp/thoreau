@@ -4,14 +4,22 @@ require_relative './case_context_builder'
 module Thoreau
   module V2
     class Case
-      def initialize group:, input:, action:, expected_output:, expected_exception:, logger:, suite_context:
-        @group = group
+      def initialize group:,
+                     input:,
+                     action:,
+                     expected_output:,
+                     expected_exception:,
+                     asserts:,
+                     logger:,
+                     suite_context:
+        @group              = group
         @input              = input
         @action             = action
         @expected_output    = expected_output
         @expected_exception = expected_exception
-        @logger = logger
-        @suite_context = suite_context
+        @asserts            = asserts
+        @logger             = logger
+        @suite_context      = suite_context
         @ran                = false
       end
 
@@ -33,6 +41,8 @@ module Thoreau
           else
             "Expected '#{@expected_exception}' exception, but raised '#{@raised_exception}' (#{@raised_exception.class.name})"
           end
+        elsif @asserts
+          @assert_result ? nil : "Assertion failed. (got #{@assert_result})"
         else
           if @raised_exception
             "Expected output, but raised exception '#{@raised_exception}'"
@@ -56,9 +66,12 @@ module Thoreau
 
       def run
         logger.debug("create_context for #{desc}")
-        context_builder = CaseContextBuilder.new(setups: @suite_context.setups, group: @group, input: @input)
-        context  = context_builder.create_context
-        @result      = context.instance_exec(nil, &(@action))
+        context_builder        = CaseContextBuilder.new(setups: @suite_context.setups, group: @group, input: @input)
+        context                = context_builder.create_context
+
+        @result                = context.instance_exec(nil, &(@action))
+
+        @assert_result         = context.instance_exec(@result, &(@asserts)) if @asserts
         @post_condition_result = context.instance_exec(@result, &(@expected_output)) if @expected_output.is_a?(Proc)
       rescue Exception => e
         @raised_exception = e
