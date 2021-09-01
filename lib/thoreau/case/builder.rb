@@ -11,7 +11,7 @@ module Thoreau
     class Builder
 
       def initialize(groups, suite_context)
-        @groups  = groups
+        @groups        = groups
         @suite_context = suite_context
       end
 
@@ -31,38 +31,55 @@ module Thoreau
       def build_test_cases!
         logger.debug "build_test_cases!"
 
-        cases = []
-
         @groups
-                .select { |g| any_focused? && g.focused? || !any_focused? }
-                .each do |g|
-
-          # We have "specs" for the inputs. These may be actual
-          # values, or they may be enumerables that need to execute.
-          # So we need to "explode" (or enumerate) the values,
-          # generating a single test for each combination.
-          input_sets = g.input_specs.flat_map do |input_spec|
-            explode_input_specs(input_spec.keys, input_spec)
-          end
-
-          input_sets.each do |input_set|
-            c = Thoreau::Case.new(
-              group:              g,
-              input:              input_set,
-              action:             @suite_context.data.action,
-              expected_output:    g.expected_output,
-              expected_exception: g.expected_exception,
-              asserts:            g.asserts,
-              suite_context:      @suite_context,
-              logger:             logger)
-            cases.push(c)
-          end
+          .select { |g| any_focused? && g.focused? || !any_focused? }
+          .flat_map do |g|
+          build_group_cases g
         end
-
-        cases
       end
 
       private
+
+      def setup_key_to_inputs key
+        setup = @suite_context.setups[key.to_s]
+        raise "Unrecognized setup context '#{key}'. Available: #{@suite_setups.keys.to_sentence}" if setup.nil?
+
+        return setup.values if setup.block.nil?
+
+        result = Class.new.new.instance_eval(&setup.block)
+        logger.error "Setup #{key} did not return a hash object" unless result.is_a?(Hash)
+        result
+      end
+
+      def build_group_cases g
+        # We have "specs" for the inputs. These may be actual
+        # values, or they may be enumerables that need to execute.
+        # So we need to "explode" (or enumerate) the values,
+        # generating a single test for each combination.
+        #
+        setup_values = g.setups
+                        .map { |key| setup_key_to_inputs key }
+                        .reduce(Hash.new) { |m, h| m.merge(h) }
+
+        input_sets = g.input_specs
+                      .map { |is| setup_values.merge(is) }
+                      .flat_map do |input_spec|
+          explode_input_specs(input_spec.keys, input_spec)
+        end
+
+        input_sets.map do |input_set|
+          Thoreau::Case.new(
+            group:              g,
+            input:              input_set,
+            action:             @suite_context.data.action,
+            expected_output:    g.expected_output,
+            expected_exception: g.expected_exception,
+            asserts:            g.asserts,
+            suite_context:      @suite_context,
+            logger:             logger)
+        end
+
+      end
 
       # Expand any values that are enumerators (Thoreau::DSL::Expanded),
       # creating a list of objects, where all the combinations

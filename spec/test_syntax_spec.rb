@@ -53,6 +53,8 @@ suite "shared setup blocks" do
   # happy "a5", output: 5 # if the name is the setup, use it
   happy setup: "a7", output: 7 # very concise test
   happy 'can have multiple setups', setups: ['a7', 'b3'], output: 10
+  happy 'last setup wins', setups: ['a7', 'a5', 'b3'], output: 8
+  happy 'input beats all setups', input: {a: 100}, setups: ['a7', 'a5', 'b3'], output: 103
 
   appendix do
     setup "a5", { a: 5 }
@@ -75,15 +77,20 @@ suite "expectation blocks" do
         fails:  true
 end
 
-suite! "input generators" do
+suite "input generators" do
   testing { i * i }
 
   happy inputs: { i: expanded([-1, 0, 1, 100, 1_000_000]) },
         equals: (proc { |_| i * i })
 
-  happy 'inputs generated from setup blocks',
-        setup: 'generate some ints',
+  happy 'inputs can be generated from setup blocks',
+        setup:  'generate some ints',
         equals: (proc { |_| i * i })
+
+  happy 'inputs overrides setup blocks',
+        setup:  'generate some ints',
+        input:  { i: 7 },
+        equals: 49
 
   appendix do
     setup 'generate some ints',
@@ -94,13 +101,13 @@ end
 suite 'appendix' do
 
   appendix do
-    inputs # what are the inputs we care about
-
-    setups # what are commend set-up scenarios
-
-    outputs # what are the outputs we care about
-
-    expectations
+    # inputs # what are the inputs we care about
+    #
+    # setups # what are commend set-up scenarios
+    #
+    # outputs # what are the outputs we care about
+    #
+    # expectations
   end
 
 end

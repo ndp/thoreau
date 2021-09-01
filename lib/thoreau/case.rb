@@ -77,7 +77,7 @@ module Thoreau
 
     def run
       logger.debug("create_context for #{desc} -> ")
-      context_builder = Case::ContextBuilder.new(setups: @suite_context.setups, group: @group, input: @input)
+      context_builder = Case::ContextBuilder.new(group: @group, input: @input)
       context         = context_builder.create_context
       begin
         # Only capture exceptions around the action itself.
