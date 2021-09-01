@@ -1,22 +1,31 @@
 module Thoreau
   class Case
+    # Build test cases.
+    #
+    # It is responsible for:
+    # - building an list of Test::Case objects based
+    #   on the groups provided.
+    # - expanding input specs in the groups into multiple cases
+    # - skipping unfocused tests, if any are focused
+    # - returning a count of those skipped
     class Builder
 
-      def initialize(context)
-        @context = context
+      def initialize(groups, suite_context)
+        @groups  = groups
+        @suite_context = suite_context
       end
 
       def logger
-        @context.logger
+        @suite_context.logger
       end
 
       def any_focused?
-        @context.data.groups.count(&:focused?) > 0
+        @groups.count(&:focused?) > 0
       end
 
       def skipped_count
         return 0 unless any_focused?
-        @context.data.groups.count - @context.data.groups.count(&:focused?)
+        @groups.count - @groups.count(&:focused?)
       end
 
       def build_test_cases!
@@ -24,13 +33,13 @@ module Thoreau
 
         cases = []
 
-        @context.data
-                .groups
+        @groups
                 .select { |g| any_focused? && g.focused? || !any_focused? }
                 .each do |g|
 
-          # We have some generic "specs" for the inputs,
-          # and we need to "explode" (or enumerate) the values,
+          # We have "specs" for the inputs. These may be actual
+          # values, or they may be enumerables that need to execute.
+          # So we need to "explode" (or enumerate) the values,
           # generating a single test for each combination.
           input_sets = g.input_specs.flat_map do |input_spec|
             explode_input_specs(input_spec.keys, input_spec)
@@ -40,11 +49,11 @@ module Thoreau
             c = Thoreau::Case.new(
               group:              g,
               input:              input_set,
-              action:             @context.data.action,
+              action:             @suite_context.data.action,
               expected_output:    g.expected_output,
               expected_exception: g.expected_exception,
               asserts:            g.asserts,
-              suite_context:      @context,
+              suite_context:      @suite_context,
               logger:             logger)
             cases.push(c)
           end
@@ -55,8 +64,9 @@ module Thoreau
 
       private
 
-      # Expand any values that are enumerators, creating a list of
-      # objects, where all the combinations of enumerated values are provided.
+      # Expand any values that are enumerators (Thoreau::DSL::Expanded),
+      # creating a list of objects, where all the combinations
+      # of enumerated values are present.
       def explode_input_specs(keys, input_spec)
         k = keys.pop
 
@@ -73,7 +83,7 @@ module Thoreau
         return specs if keys.empty?
 
         specs.flat_map do |spec|
-          explode_input_specs(keys, spec)
+          explode_input_specs(keys, spec) # recurse!
         end
 
       end

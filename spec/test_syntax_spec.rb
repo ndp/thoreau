@@ -49,15 +49,15 @@ end
 suite "shared setup blocks" do
   testing { a + (respond_to?(:b) ? b : 0) }
 
-  happy "when a is 5", setup: "a=5", output: 5
-  # happy "a=5", output: 5 # if the name is the setup, use it
-  happy setup: "a=7", output: 7 # very concise test
-  happy 'can have multiple setups', setups: ['a=7', 'b=3'], output: 10
+  happy "when a is 5", setup: "a5", output: 5
+  # happy "a5", output: 5 # if the name is the setup, use it
+  happy setup: "a7", output: 7 # very concise test
+  happy 'can have multiple setups', setups: ['a7', 'b3'], output: 10
 
   appendix do
-    setup "a=5", { a: 5 }
-    setup("a=7") { { a: 7 } } # proc that returns a value
-    setup "b=3", { b: 3 }
+    setup "a5", { a: 5 }
+    setup("a7") { { a: 7 } } # proc that returns a value
+    setup "b3", { b: 3 }
   end
 end
 
@@ -75,11 +75,20 @@ suite "expectation blocks" do
         fails:  true
 end
 
-suite "input generators" do
+suite! "input generators" do
   testing { i * i }
 
   happy inputs: { i: expanded([-1, 0, 1, 100, 1_000_000]) },
-        equals: (proc { |result| i * i })
+        equals: (proc { |_| i * i })
+
+  happy 'inputs generated from setup blocks',
+        setup: 'generate some ints',
+        equals: (proc { |_| i * i })
+
+  appendix do
+    setup 'generate some ints',
+          { i: expanded([-1, 0, 1, 100, 1_000_000]) }
+  end
 end
 
 suite 'appendix' do

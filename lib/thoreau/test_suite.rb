@@ -12,14 +12,15 @@ module Thoreau
       @name    = name
       @focus   = focus
       @@suites << self
-      @builder = Thoreau::Case::Builder.new @context
+      @builder = Thoreau::Case::Builder.new @context.data.groups, @context
     end
 
     def build_and_run
       cases = @builder.build_test_cases!
 
       runner = Thoreau::Case::Runner.new @context
-      runner.run_test_cases! cases, @builder.skipped_count
+      runner.run_test_cases! cases,
+                             @builder.skipped_count # for reporting
     end
 
     def focused?
