@@ -1,4 +1,5 @@
 require_relative '../spec_group'
+require_relative './expanded'
 
 module Thoreau
   module DSL
@@ -33,6 +34,10 @@ module Thoreau
           group       = self.send(sym, *args)
           group.focus = true
           group
+        end
+
+        def expanded(a)
+          Thoreau::DSL::Expanded.new(a)
         end
       end
     end

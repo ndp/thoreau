@@ -78,7 +78,7 @@ end
 suite "input generators" do
   testing { i * i }
 
-  happy inputs: { i: Enumerator.new([-1, 0, 1, 100, 1_000_000]) },
+  happy inputs: { i: expanded([-1, 0, 1, 100, 1_000_000]) },
         equals: (proc { |result| i * i })
 end
 

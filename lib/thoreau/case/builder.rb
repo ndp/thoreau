@@ -61,7 +61,7 @@ module Thoreau
         k = keys.pop
 
         value_spec = input_spec[k]
-        specs      = if value_spec.is_a?(Enumerator)
+        specs      = if value_spec.is_a?(Thoreau::DSL::Expanded)
                        value_spec.map do |v|
                          input_spec.merge(k => v)
                        end
