@@ -2,29 +2,15 @@
 
 A more thoughtful test framework
 
-> Testing shows the presence, not the absence of bugs. -- Edsger W. Dijkstra
-
-## Why?
+![alt text](docs/thoreau-sample-annotated.png "Example test case using Thoreau")
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'thoreau'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install thoreau
+Add `gem 'thoreau'` to your application's Gemfile, or `gem install thoreau`. Neither Rails nor another test framework is required.
 
 ## Usage
 
-TODO: Write usage instructions here
+Create a Ruby file. Here's an example:
 
 ```ruby
 require 'thoreau/dsl'
@@ -133,3 +119,6 @@ Everyone interacting in the Thoreau project’s codebases, issue trackers, chat 
 follow the [code of conduct](https://github.com/ndp/thoreau/blob/master/CODE_OF_CONDUCT.md).
 
 
+## le archive
+
+> Testing shows the presence, not the absence of bugs. -- Edsger W. Dijkstra

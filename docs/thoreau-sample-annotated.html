@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thoreau Suite Structure</title>
+  <style>
+    .annotations, code {
+      box-sizing: border-box;
+      position: absolute;
+      top: 100px;
+      left: 0;
+      margin: 0;
+      padding: 40px 0px 40px 20px;
+      font-size: 16px;
+      line-height: 20px;
+      width: 80ex;
+      white-space: pre-wrap;
+    }
+
+    code {
+      background-color: black;
+      color: gainsboro;
+      font-family: "Source Code Pro", Monaco, monospace;
+    }
+
+    code var {
+      font-weight: 900;
+      color: aliceblue;
+    }
+
+    .annotations {
+      padding-left: 40ex;
+      padding-top: 38px; /* this font needs a nudge */
+      background-color: transparent;
+      color: yellowgreen;
+      font-style: italic;
+      font-family: Serif;
+    }
+    .annotations var {
+      font-family: "Source Code Pro", Monaco, monospace;
+    }
+
+    .annotations ul,
+    .annotations li {
+      margin: 0;
+      padding: 0;
+      line-height: inherit;
+      white-space: normal;
+    }
+    .annotations li {
+      margin-left: 20px;
+    }
+
+  </style>
+</head>
+<body>
+<br>
+<br>
+<code>
+<var>test_suite</var> do
+
+  <var>testing</var> do
+     a + b
+  end
+
+
+  <var>spec</var> "addition works",
+       setup:  'set up a',
+       input: { b: 5 },
+       expect:  42
+
+
+
+  <var>appendix</var> do
+    <var>setup</var> 'set up a',
+       { a: 37 }
+  end
+end
+</code>
+<div class='annotations'>
+<var>test_suite</var> wraps a set of tests.
+
+Describe the subject of what
+you're testing with a block up front. There's
+no need to write the perfect description
+or make readers hunt for the code.
+
+Tests are declarative with:<ul>
+      <li>name</li>
+      <li>setup (shared in the appendix)</li>
+      <li>inputs (supplement or override <var>setups</var>)</li>
+      <li>expectations for output</li></ul>
+You hide <var>setup</var> code and other
+complexities down in an <var>appendix</var>
+This helps readers understand the overall
+test approach.
+</div>
+
+</body>
+</html>
