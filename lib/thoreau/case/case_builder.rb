@@ -34,7 +34,7 @@ module Thoreau
         @test_families
           .select { |g| any_focused? && g.focused? || !any_focused? }
           .flat_map do |g|
-          build_group_cases g
+          build_family_cases g
         end
       end
 
@@ -51,17 +51,17 @@ module Thoreau
         result
       end
 
-      def build_group_cases g
+      def build_family_cases fam
         # We have "specs" for the inputs. These may be actual
         # values, or they may be enumerables that need to execute.
         # So we need to "explode" (or enumerate) the values,
         # generating a single test for each combination.
         #
-        setup_values = g.setups
+        setup_values = fam.setups
                         .map { |key| setup_key_to_inputs key }
                         .reduce(Hash.new) { |m, h| m.merge(h) }
 
-        input_sets = g.input_specs
+        input_sets = fam.input_specs
                       .map { |is| setup_values.merge(is) }
                       .flat_map do |input_spec|
           explode_input_specs(input_spec.keys, input_spec)
@@ -69,12 +69,12 @@ module Thoreau
 
         input_sets.map do |input_set|
           Thoreau::TestCase.new(
-            group:              g,
+            test_family:              fam,
             input:              input_set,
             action_block:       @suite_data.action_block,
-            expected_output:    g.expected_output,
-            expected_exception: g.expected_exception,
-            asserts:            g.asserts,
+            expected_output:    fam.expected_output,
+            expected_exception: fam.expected_exception,
+            asserts:            fam.asserts,
             logger:             logger)
         end
 

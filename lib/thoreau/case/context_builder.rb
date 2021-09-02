@@ -2,9 +2,8 @@ module Thoreau
   module Case
     class ContextBuilder
 
-      def initialize(group:, input:)
-        @group        = group
-        @input        = input
+      def initialize(input:)
+        @input = input
       end
 
       def create_context

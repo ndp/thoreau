@@ -15,9 +15,18 @@ module Thoreau
       super
     end
 
-    def legacy_result(test_case)
-
+    def fetch(test_family, input)
+      o = {
+        kind:  test_family.kind,
+        desc:  test_family.desc,
+        input: input
+      }
+      key =o.to_json
+      puts '****'*100
+      puts key
     end
+
+    def legacy_result(test_case) end
 
     def file_name
       './sample-data.json'
@@ -28,7 +37,7 @@ module Thoreau
     end
 
     def read
-      file = File.read(file_name)
+      file       = File.read(file_name)
       @data_hash = JSON.parse(file)
     end
 

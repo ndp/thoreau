@@ -1,20 +1,23 @@
 require 'active_support/core_ext/module/delegation'
 require_relative './case/context_builder'
+require_relative './legacy_results'
 
 module Thoreau
   class TestCase
-    def initialize group:,
+    def initialize test_family:,
                    input:,
                    action_block:,
                    expected_output:,
                    expected_exception:,
                    asserts:,
                    logger:
-      @group  = group
+      @test_family  = test_family
       @input  = input
       @action_block = action_block
       if expected_output.is_a?(Proc)
         @expected_output_proc = expected_output
+      elsif expected_output == :legacy
+        @expected_legacy_output = LegacyResults.new.fetch(test_family, input)
       else
         @expected_output = expected_output
       end
@@ -24,10 +27,10 @@ module Thoreau
       @ran                = false
     end
 
-    delegate :failure_expected?, to: :@group
+    delegate :failure_expected?, to: :@test_family
 
     def desc
-      "#{@group.kind}:  #{@group.desc} #{(@input == {} ? nil : @input.sort.to_h) || @expected_exception || "(no args)"}"
+      "#{@test_family.kind}:  #{@test_family.desc} #{(@input == {} ? nil : @input.sort.to_h) || @expected_exception || "(no args)"}"
     end
 
     def problem
@@ -75,7 +78,7 @@ module Thoreau
 
     def run
       logger.debug("create_context for #{desc} -> ")
-      context_builder = Case::ContextBuilder.new(group: @group, input: @input)
+      context_builder = Case::ContextBuilder.new(input: @input)
       context         = context_builder.create_context
       begin
         # Only capture exceptions around the action itself.
