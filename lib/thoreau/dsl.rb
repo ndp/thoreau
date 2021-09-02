@@ -26,12 +26,12 @@ module Thoreau
       logger.level = Logger::DEBUG if ENV['DEBUG']
 
       @context = Thoreau::DSL::SuiteContext.new(name, @logger)
+      @context.instance_eval(&block)
 
       appendix_context = Thoreau::DSL::Appendix.new(@context)
-      groups_context   = Thoreau::DSL::Groups.new(@context)
+      appendix_context.instance_eval(&@context.data.appendix_block) unless @context.data.appendix_block.nil?
 
-      @context.instance_eval(&block)
-      appendix_context.instance_eval(&@context.data.appendix) unless @context.data.appendix.nil?
+      groups_context   = Thoreau::DSL::Groups.new(@context)
       groups_context.instance_eval(&@context.data.cases) unless @context.data.cases.nil?
 
       TestSuite.new(context: @context, focus: focus, logger: logger, name: name)

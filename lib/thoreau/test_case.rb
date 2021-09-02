@@ -5,7 +5,7 @@ module Thoreau
   class TestCase
     def initialize group:,
                    input:,
-                   action:,
+                   action_block:,
                    expected_output:,
                    expected_exception:,
                    asserts:,
@@ -13,7 +13,7 @@ module Thoreau
                    suite_context:
       @group  = group
       @input  = input
-      @action = action
+      @action_block = action_block
       if expected_output.is_a?(Proc)
         @expected_output_proc = expected_output
       else
@@ -81,7 +81,7 @@ module Thoreau
       context         = context_builder.create_context
       begin
         # Only capture exceptions around the action itself.
-        @result = context.instance_exec(&(@action))
+        @result = context.instance_exec(&(@action_block))
       rescue Exception => e
         @raised_exception = e
         return

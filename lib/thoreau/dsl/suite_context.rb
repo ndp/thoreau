@@ -1,9 +1,9 @@
 module Thoreau
   module DSL
-    class Data
-      attr_accessor :action
+    class TestSuiteData
+      attr_accessor :action_block
       attr_accessor :cases
-      attr_accessor :appendix
+      attr_accessor :appendix_block
       attr_accessor :groups
 
       def initialize
@@ -21,13 +21,13 @@ module Thoreau
       def initialize name, logger
         @name   = name
         @logger = logger
-        @data   = Data.new
+        @data   = TestSuiteData.new
         @setups = {}
       end
 
       def action(&block)
-        logger.debug "adding action"
-        @data.action = block
+        logger.debug "adding action block"
+        @data.action_block = block
       end
 
       alias testing action
@@ -41,8 +41,8 @@ module Thoreau
       alias test_cases cases
 
       def appendix(&block)
-        logger.debug "adding appendix"
-        @data.appendix = block
+        logger.debug "adding appendix block"
+        @data.appendix_block = block
       end
 
       def context

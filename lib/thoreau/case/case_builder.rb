@@ -71,7 +71,7 @@ module Thoreau
           Thoreau::TestCase.new(
             group:              g,
             input:              input_set,
-            action:             @suite_context.data.action,
+            action_block:       @suite_context.data.action_block,
             expected_output:    g.expected_output,
             expected_exception: g.expected_exception,
             asserts:            g.asserts,
