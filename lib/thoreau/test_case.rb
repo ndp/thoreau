@@ -2,7 +2,7 @@ require 'active_support/core_ext/module/delegation'
 require_relative './case/context_builder'
 
 module Thoreau
-  class Case
+  class TestCase
     def initialize group:,
                    input:,
                    action:,

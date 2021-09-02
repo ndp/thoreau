@@ -1,5 +1,5 @@
 module Thoreau
-  class Case
+  module Case
     class ContextBuilder
 
       def initialize(group:, input:)

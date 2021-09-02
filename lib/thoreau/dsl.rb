@@ -1,9 +1,9 @@
 require 'logger'
 
 require 'thoreau/test_suite'
-require 'thoreau/case'
-require 'thoreau/case/builder'
-require 'thoreau/case/runner'
+require 'thoreau/test_case'
+require 'thoreau/case/case_builder'
+require 'thoreau/case/case_runner'
 require 'thoreau/dsl/groups_support'
 require 'thoreau/dsl/context'
 require 'thoreau/dsl/groups'

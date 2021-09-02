@@ -1,5 +1,5 @@
 module Thoreau
-  class Case
+  module Case
     # Build test cases.
     #
     # It is responsible for:
@@ -8,7 +8,7 @@ module Thoreau
     # - expanding input specs in the groups into multiple cases
     # - skipping unfocused tests, if any are focused
     # - returning a count of those skipped
-    class Builder
+    class CaseBuilder
 
       def initialize(groups, suite_context)
         @groups        = groups
@@ -68,7 +68,7 @@ module Thoreau
         end
 
         input_sets.map do |input_set|
-          Thoreau::Case.new(
+          Thoreau::TestCase.new(
             group:              g,
             input:              input_set,
             action:             @suite_context.data.action,
