@@ -14,21 +14,7 @@ end
 suite "legacy testing" do
   testing { weirdass_legacy_code(a, b, c) }
 
-  spec input: { a: -10000, b: -10, c: 8 }, legacy: 'abc'
+  spec input: { a: -10000, b: -10, c: 8 }, expected: legacy_values('abc')
+  spec input: { a: -20000, b: -10, c: 8 }, expected: legacy_values('abc2')
 
-end
-
-test_suite do
-  testing do
-    a + b
-  end
-
-  spec "name of spec",
-       setup:  'set up a',
-       input:  { b: 5 },
-       expect: 42
-
-  appendix do
-    setup 'set up a', { a: 37 }
-  end
 end

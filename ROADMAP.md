@@ -5,7 +5,8 @@
 * [x] dynamic expects blocks
 * [x] Multiple inputs support
 * [x] focus on tests with a bang "happy!"
-* [ ] Legacy support
+* [-] Legacy support
+* if there are no assertions, warn, "Do you want me to remember this for a legacy values?"
 * Tighten up errors
   * [ ] complain if there's no testing/subject
   * [ ] warns about unused setups

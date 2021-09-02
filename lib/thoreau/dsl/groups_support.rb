@@ -8,7 +8,7 @@ module Thoreau
     SPEC_GROUP_NAMES = %i[happy sad spec edge edges boundary corner gigo]
     # gigo = garbage in / garbage out
     #
-    GROUP_PROPS         = %w[assert asserts raises output equal equals expect expects expected legacy pending fails inputs input setup setups].sort.freeze
+    GROUP_PROPS         = %w[assert asserts raises output equal equals expect expects expected pending fails inputs input setup setups].sort.freeze
     PROPS_SPELL_CHECKER = DidYouMean::SpellChecker.new(dictionary: GROUP_PROPS)
 
     module GroupsSupport
@@ -35,7 +35,6 @@ module Thoreau
                                 failure_expected:   spec[:pending] || spec[:fails],
                                 input_specs:        [spec[:inputs] || spec[:input] || {}].flatten,
                                 kind:               sym,
-                                legacy:             spec[:legacy],
                                 setups:             [spec[:setup], spec[:setups]].flatten.compact
           logger.debug "Adding group #{group}"
           context.data.groups.push(group)
@@ -47,11 +46,16 @@ module Thoreau
           group.focus = true
           group
         end
-
-        def expanded(a)
-          Thoreau::DSL::Expanded.new(a)
-        end
       end
+
+      def expanded(a)
+        Thoreau::DSL::Expanded.new(a)
+      end
+
+      def legacy_values(k = nil)
+        :legacy # some sort of legacy marker
+      end
+
     end
 
   end
