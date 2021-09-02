@@ -12,8 +12,10 @@ module Thoreau
     PROPS_SPELL_CHECKER = DidYouMean::SpellChecker.new(dictionary: GROUP_PROPS)
 
     module GroupsSupport
+
       # Note: requires `suite_data`.
-      SPEC_GROUP_NAMES.each do |sym|
+
+      def self.def_family_methods_for(sym)
         define_method sym do |*args|
           desc = args.shift if args.size > 1 && args.first.is_a?(String)
           raise "Too many arguments to #{sym}!" if args.size > 1
@@ -45,6 +47,11 @@ module Thoreau
           group.focus = true
           group
         end
+      end
+
+
+      SPEC_GROUP_NAMES.each do |sym|
+        def_family_methods_for sym
       end
 
       def expanded(a)
