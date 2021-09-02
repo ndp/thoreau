@@ -10,8 +10,8 @@ module Thoreau
     # - returning a count of those skipped
     class CaseBuilder
 
-      def initialize(groups, suite_data)
-        @groups        = groups
+      def initialize(test_families, suite_data)
+        @test_families = test_families
         @suite_data    = suite_data
       end
 
@@ -20,18 +20,18 @@ module Thoreau
       end
 
       def any_focused?
-        @groups.count(&:focused?) > 0
+        @test_families.count(&:focused?) > 0
       end
 
       def skipped_count
         return 0 unless any_focused?
-        @groups.count - @groups.count(&:focused?)
+        @test_families.count - @test_families.count(&:focused?)
       end
 
       def build_test_cases!
         logger.debug "build_test_cases!"
 
-        @groups
+        @test_families
           .select { |g| any_focused? && g.focused? || !any_focused? }
           .flat_map do |g|
           build_group_cases g
