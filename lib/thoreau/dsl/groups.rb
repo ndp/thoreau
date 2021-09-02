@@ -2,15 +2,14 @@ module Thoreau
   module DSL
     class Groups
 
-      attr_reader :context
+      attr_reader :suite_data
+      attr_reader :logger
 
       def initialize(context, &group_context)
-        @context = context
-        self.instance_eval(&group_context)
-      end
+        @logger = context.logger
+        @suite_data = context.suite_data
 
-      def logger *args
-        @context.logger *args
+        self.instance_eval(&group_context)
       end
 
       include Thoreau::DSL::GroupsSupport

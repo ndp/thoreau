@@ -10,9 +10,10 @@ module Thoreau
     # - returning a count of those skipped
     class CaseBuilder
 
-      def initialize(groups, suite_context)
+      def initialize(groups, suite_context, suite_data)
         @groups        = groups
         @suite_context = suite_context
+        @suite_data    = suite_data
       end
 
       def logger
@@ -41,8 +42,8 @@ module Thoreau
       private
 
       def setup_key_to_inputs key
-        setup = @suite_context.setups[key.to_s]
-        raise "Unrecognized setup context '#{key}'. Available: #{@suite_setups.keys.to_sentence}" if setup.nil?
+        setup = @suite_data.setups[key.to_s]
+        raise "Unrecognized setup context '#{key}'. Available: #{@suite_data.setups.keys.to_sentence}" if setup.nil?
 
         return setup.values if setup.block.nil?
 
@@ -71,7 +72,7 @@ module Thoreau
           Thoreau::TestCase.new(
             group:              g,
             input:              input_set,
-            action_block:       @suite_context.data.action_block,
+            action_block:       @suite_data.action_block,
             expected_output:    g.expected_output,
             expected_exception: g.expected_exception,
             asserts:            g.asserts,

@@ -17,6 +17,7 @@ module Thoreau
   module DSL
 
     attr_reader :logger
+    attr_reader :suite_data
 
     def test_suite name = nil, focus: false, &block
       @logger      = Logger.new(STDOUT, formatter: proc { |severity, datetime, progname, msg|
@@ -25,14 +26,14 @@ module Thoreau
       logger.level = Logger::INFO
       logger.level = Logger::DEBUG if ENV['DEBUG']
 
-      test_suite_data = TestSuiteData.new
-      @context = Thoreau::DSL::SuiteContext.new(name, test_suite_data, @logger)
+      @suite_data = TestSuiteData.new
+      @context = Thoreau::DSL::SuiteContext.new(name, @suite_data, @logger)
       @context.instance_eval(&block)
 
-      appendix_block = @context.data.appendix_block
-      Thoreau::DSL::Appendix.new(@context, &appendix_block) unless appendix_block.nil?
+      appendix_block = @suite_data.appendix_block
+      Thoreau::DSL::Appendix.new(@suite_data, &appendix_block) unless appendix_block.nil?
 
-      cases_block = @context.data.cases_block
+      cases_block = @suite_data.cases_block
       Thoreau::DSL::Groups.new(@context, &cases_block) unless cases_block.nil?
 
       TestSuite.new(context: @context, focus: focus, logger: logger, name: name)

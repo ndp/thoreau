@@ -12,7 +12,7 @@ module Thoreau
     PROPS_SPELL_CHECKER = DidYouMean::SpellChecker.new(dictionary: GROUP_PROPS)
 
     module GroupsSupport
-      # Note: requires `logger` and `context`.
+      # Note: requires `logger` and `suite_data`.
       SPEC_GROUP_NAMES.each do |sym|
         define_method sym do |*args|
           desc = args.shift if args.size > 1 && args.first.is_a?(String)
@@ -37,7 +37,7 @@ module Thoreau
                                 kind:               sym,
                                 setups:             [spec[:setup], spec[:setups]].flatten.compact
           logger.debug "Adding group #{group}"
-          context.data.group_specs.push(group)
+          suite_data.group_specs.push(group)
           group
         end
 

@@ -12,7 +12,8 @@ module Thoreau
       @name    = name
       @focus   = focus
       @@suites << self
-      @builder = Thoreau::Case::CaseBuilder.new @context.data.group_specs, @context
+
+      @builder = Thoreau::Case::CaseBuilder.new @context.suite_data.group_specs, @context, @context.suite_data
     end
 
     def build_and_run
