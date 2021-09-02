@@ -4,8 +4,9 @@ module Thoreau
 
       attr_reader :context
 
-      def initialize(context)
+      def initialize(context, &group_context)
         @context = context
+        self.instance_eval(&group_context)
       end
 
       def logger *args

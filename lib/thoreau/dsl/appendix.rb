@@ -3,8 +3,9 @@ require_relative '../setup'
 module Thoreau
   module DSL
     class Appendix
-      def initialize(context)
+      def initialize(context, &appendix_block)
         @context = context
+        self.instance_eval(&appendix_block)
       end
 
       def setup name, values = {}, &block

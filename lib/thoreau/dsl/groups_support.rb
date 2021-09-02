@@ -37,7 +37,7 @@ module Thoreau
                                 kind:               sym,
                                 setups:             [spec[:setup], spec[:setups]].flatten.compact
           logger.debug "Adding group #{group}"
-          context.data.groups.push(group)
+          context.data.group_specs.push(group)
           group
         end
 

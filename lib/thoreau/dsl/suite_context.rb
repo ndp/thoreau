@@ -1,15 +1,7 @@
+require_relative '../test_suite_data'
+
 module Thoreau
   module DSL
-    class TestSuiteData
-      attr_accessor :action_block
-      attr_accessor :cases
-      attr_accessor :appendix_block
-      attr_accessor :groups
-
-      def initialize
-        @groups = []
-      end
-    end
 
     class SuiteContext
 
@@ -18,10 +10,10 @@ module Thoreau
       attr_reader :logger
       attr_reader :setups
 
-      def initialize name, logger
+      def initialize name, data, logger
         @name   = name
         @logger = logger
-        @data   = TestSuiteData.new
+        @data   = data
         @setups = {}
       end
 
@@ -35,7 +27,7 @@ module Thoreau
 
       def cases(&block)
         logger.debug "adding cases"
-        @data.cases = block
+        @data.cases_block = block
       end
 
       alias test_cases cases
