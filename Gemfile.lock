@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    thoreau (0.2.0)
+    thoreau (0.2.1)
       activesupport (>= 5, < 7)
 
 GEM

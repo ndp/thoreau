@@ -10,35 +10,30 @@ Add `gem 'thoreau'` to your application's Gemfile, or `gem install thoreau`. Nei
 
 ## Usage
 
-Create a Ruby file. Here's an example:
+Create a Ruby file. Here's an `example.rb`:
 
 ```ruby
-require 'thoreau/dsl'
+require 'thoreau'
 include Thoreau::DSL
 
-test_suite "winners and losers" do
+suite "example suite" do
+    
+    testing do
+        1 + 1
+    end
 
-  subject { rock_paper_scissors(a, b) }
-
-  happy "rock beats scissors",
-        inputs: [{ a: 'rock', b: 'scissors' },{ b: 'rock', a: 'scissors' }],
-        equals: :rock
-  happy "scissors beats paper",
-        inputs: [{ a: 'paper', b: 'scissors' }, { b: 'paper', a: 'scissors' }],
-        equals: :scissors
-  happy "paper beats rock",
-        inputs: [{ a: 'paper', b: 'rock' }, { b: 'paper', a: 'rock' }],
-        equals: :paper
-
-  spec "symbols can be used",
-       inputs: [{ a: :paper, b: :rock }],
-       equals: :paper
-
-  spec "uppercase can be used",
-       inputs: [{ a: "Paper", b: "Rock" }],
-       equals: :paper
+    spec output: 2
+    spec output: 3
 
 end
+```
+Then, in your terminal:
+```shell
+$ bundle exec ruby example.rb 
+INFO:   § example suite §
+INFO:   ✓ spec:   (no args)
+ERROR: ❓ spec:   (no args), Expected '3', but got '2'
+INFO:  🛑  1 problem(s) detected.  [1 of 2 OK.]
 ```
 
 ## Why
