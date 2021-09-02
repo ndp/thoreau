@@ -5,7 +5,7 @@ require 'thoreau/test_case'
 require 'thoreau/case/case_builder'
 require 'thoreau/case/case_runner'
 require 'thoreau/dsl/groups_support'
-require 'thoreau/dsl/context'
+require 'thoreau/dsl/suite_context'
 require 'thoreau/dsl/groups'
 require 'thoreau/dsl/appendix'
 
@@ -25,7 +25,7 @@ module Thoreau
       logger.level = Logger::INFO
       logger.level = Logger::DEBUG if ENV['DEBUG']
 
-      @context = Thoreau::DSL::Context.new(name, @logger)
+      @context = Thoreau::DSL::SuiteContext.new(name, @logger)
 
       appendix_context = Thoreau::DSL::Appendix.new(@context)
       groups_context   = Thoreau::DSL::Groups.new(@context)

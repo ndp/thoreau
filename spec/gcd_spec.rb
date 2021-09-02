@@ -41,13 +41,13 @@ suite do
   end
 
   appendix do
-    inputs # what are the inputs we care about
+    # inputs # what are the inputs we care about
 
-    setups # what are commend set-up scenarios
+    # setups # what are commend set-up scenarios
 
-    outputs # what are the outputs we care about
+    # outputs # what are the outputs we care about
 
-    expectations
+    # expectations
   end
 end
 

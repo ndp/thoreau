@@ -11,7 +11,7 @@ module Thoreau
       end
     end
 
-    class Context
+    class SuiteContext
 
       attr_reader :data
       attr_reader :name
