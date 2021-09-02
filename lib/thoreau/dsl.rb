@@ -26,7 +26,7 @@ module Thoreau
       logger.level = Logger::INFO
       logger.level = Logger::DEBUG if ENV['DEBUG']
 
-      @suite_data = TestSuiteData.new
+      @suite_data = TestSuiteData.new logger
       @context = Thoreau::DSL::SuiteContext.new(name, @suite_data, @logger)
       @context.instance_eval(&block)
 

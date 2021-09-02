@@ -9,8 +9,7 @@ module Thoreau
                    expected_output:,
                    expected_exception:,
                    asserts:,
-                   logger:,
-                   suite_context:
+                   logger:
       @group  = group
       @input  = input
       @action_block = action_block
@@ -22,7 +21,6 @@ module Thoreau
       @expected_exception = expected_exception
       @assert_proc        = asserts
       @logger             = logger
-      @suite_context      = suite_context
       @ran                = false
     end
 

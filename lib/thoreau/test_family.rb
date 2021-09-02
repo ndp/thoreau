@@ -1,6 +1,6 @@
 module Thoreau
 
-  class SpecGroup
+  class TestFamily
     attr_reader :asserts,
                 :desc,
                 :expected_exception,

@@ -10,14 +10,13 @@ module Thoreau
     # - returning a count of those skipped
     class CaseBuilder
 
-      def initialize(groups, suite_context, suite_data)
+      def initialize(groups, suite_data)
         @groups        = groups
-        @suite_context = suite_context
         @suite_data    = suite_data
       end
 
       def logger
-        @suite_context.logger
+        @suite_data.logger
       end
 
       def any_focused?
@@ -76,7 +75,6 @@ module Thoreau
             expected_output:    g.expected_output,
             expected_exception: g.expected_exception,
             asserts:            g.asserts,
-            suite_context:      @suite_context,
             logger:             logger)
         end
 
