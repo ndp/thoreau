@@ -8,15 +8,17 @@ module Thoreau
 
     include Thoreau::Logging
 
-    def initialize test_family:,
+    def initialize family_desc:,
                    input:,
                    action_block:,
                    expectation:,
-                   asserts:
+                   asserts:,
+                   expect_failure:
 
-      @test_family  = test_family
-      @input        = input
-      @action_block = action_block
+      @family_desc    = family_desc
+      @input          = input
+      @action_block   = action_block
+      @expect_failure = expect_failure
 
       @expectation = expectation
 
@@ -25,10 +27,12 @@ module Thoreau
       @ran = false
     end
 
-    delegate :failure_expected?, to: :@test_family
+    def failure_expected?
+      @expect_failure
+    end
 
     def desc
-      "#{@test_family.kind}:  #{@test_family.desc} #{(@input == {} ? nil : @input.sort.to_h) || @expectation.exception || "(no args)"}"
+      "#{@family_desc} #{(@input == {} ? nil : @input.sort.to_h) || @expectation.exception || "(no args)"}"
     end
 
     def problem
