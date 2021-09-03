@@ -14,7 +14,15 @@ end
 suite "legacy testing" do
   testing { weirdass_legacy_code(a, b, c) }
 
-  spec input: { a: -10000, b: -10, c: 8 }, expected: legacy_values('abc')
-  spec input: { a: -20000, b: -10, c: 8 }, expected: legacy_values('abc2')
+  spec input: { a: -10000, b: -10, c: 8 }, expected: legacy_values
+  spec input: { a: -20000, b: -10, c: 8 }, expected: legacy_values
+  spec input: { a: 10001, b: -10, c: 8 }, expected: legacy_values
+  spec input: { a: 10002, b: -10, c: 8 }, expected: legacy_values
+  spec input: { a: 0, b: 0, c: 8 }, expected: legacy_values
+  spec input: { a: 0, b: -1, c: 8 }, expected: legacy_values
+  spec input: { a: -1, b: -1, c: 8 }, expected: legacy_values
+  spec input: { a: -1, b: 0, c: 8 }, expected: legacy_values
+  spec input: { a: 7, b: 7, c: 7 }, expected: legacy_values
+  spec input: { a: 7, b: 7, c: 8 }, expected: legacy_values
 
 end
