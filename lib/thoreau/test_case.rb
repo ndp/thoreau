@@ -13,12 +13,12 @@ module Thoreau
                    action_block:,
                    expectation:,
                    asserts:,
-                   expect_failure:
+                   negativo:
 
       @family_desc    = family_desc
       @input          = input
       @action_block   = action_block
-      @expect_failure = expect_failure
+      @negativo = negativo
 
       @expectation = expectation
 
@@ -28,7 +28,7 @@ module Thoreau
     end
 
     def failure_expected?
-      @expect_failure
+      @negativo
     end
 
     def desc

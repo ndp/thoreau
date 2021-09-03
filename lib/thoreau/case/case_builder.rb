@@ -70,12 +70,12 @@ module Thoreau
           expectation = Outcome.new output:    fam.expected_output,
                                     exception: fam.expected_exception
 
-          Thoreau::TestCase.new family_desc:    "#{fam.kind.to_s.ljust(8)}  #{fam.desc}",
-                                input:          input_set,
-                                action_block:   @action_block,
-                                expectation:    expectation,
-                                asserts:        fam.asserts,
-                                expect_failure: fam.failure_expected?
+          Thoreau::TestCase.new family_desc:  "#{fam.kind.to_s.ljust(8)}  #{fam.desc}",
+                                input:        input_set,
+                                action_block: @action_block,
+                                expectation:  expectation,
+                                asserts:      fam.asserts,
+                                negativo:     fam.failure_expected?
         end
 
       end
