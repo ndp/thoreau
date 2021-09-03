@@ -4,13 +4,16 @@ require_relative './legacy_results'
 
 module Thoreau
   class TestCase
+
+    include Thoreau::Logging
+
     def initialize test_family:,
                    input:,
                    action_block:,
                    expected_output:,
                    expected_exception:,
-                   asserts:,
-                   logger:
+                   asserts:
+
       @test_family  = test_family
       @input  = input
       @action_block = action_block
@@ -23,7 +26,6 @@ module Thoreau
       end
       @expected_exception = expected_exception
       @assert_proc        = asserts
-      @logger             = logger
       @ran                = false
     end
 
@@ -34,10 +36,12 @@ module Thoreau
     end
 
     def problem
+
       run unless @ran
+
       if @expected_exception
 
-        logger.debug " -> @expected_exception:#{@expected_exception} @raised_exception:#{@raised_exception}"
+        logger.debug " -> Expected Exception #{@expected_exception} @raised_exception:#{@raised_exception}"
 
         if @raised_exception.to_s == @expected_exception.to_s
           nil
@@ -51,12 +55,12 @@ module Thoreau
 
       elsif @assert_proc
 
-        logger.debug " -> @assert_result: #{@assert_result}"
+        logger.debug " -> Assert Proc result=#{@assert_result}"
 
         @assert_result ? nil : "Assertion failed. (got #{@assert_result})"
       else
 
-        logger.debug " -> @result: #{@result} @expected_output: #{@expected_output} @raised_exception:#{@raised_exception}"
+        logger.debug " -> Result expected: result=#{@result} @expected_output: #{@expected_output} @raised_exception:#{@raised_exception}"
 
         if @raised_exception
           "Expected output, but raised exception '#{@raised_exception}'"
@@ -77,7 +81,7 @@ module Thoreau
     end
 
     def run
-      logger.debug("create_context for #{desc} -> ")
+      logger.debug "## RUN #{desc}"
       context_builder = Case::ContextBuilder.new(input: @input)
       context         = context_builder.create_context
       begin

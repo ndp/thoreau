@@ -1,15 +1,24 @@
 require_relative '../test_family'
 require_relative './expanded'
+require_relative '../util'
 require 'active_support/core_ext/array/conversions'
 
 module Thoreau
   module DSL
 
-    SPEC_GROUP_NAMES = %i[happy sad spec edge edges boundary corner gigo]
+    SPEC_FAMILY_NAMES = %i[happy sad spec edge edges boundary corner gigo]
     # gigo = garbage in / garbage out
     #
-    GROUP_PROPS         = %w[assert asserts raises output equal equals expect expects expected pending fails inputs input setup setups].sort.freeze
-    PROPS_SPELL_CHECKER = DidYouMean::SpellChecker.new(dictionary: GROUP_PROPS)
+    PROPS       = {
+      asserts:            %i[assert asserts post post_condition],
+      expected_exception: %i[raises],
+      expected_output:    %i[equals equal expected expect expects output],
+      failure_expected:   %i[fails pending],
+      input_specs:        %i[input inputs],
+      setups:             %i[setup setups]
+    }
+    ALL_PROPS = PROPS.values.flatten.map(&:to_s)
+    PROPS_SPELL_CHECKER = DidYouMean::SpellChecker.new(dictionary: ALL_PROPS)
 
     module GroupsSupport
 
@@ -20,37 +29,36 @@ module Thoreau
           desc = args.shift if args.size > 1 && args.first.is_a?(String)
           raise "Too many arguments to #{sym}!" if args.size > 1
 
-          spec = args.first || {}
+          spec = args.first&.stringify_keys || {}
           spec.keys
-              .reject { |k| GROUP_PROPS.include? k.to_s }
+              .reject { |k| ALL_PROPS.include? k }
               .each do |k|
             suggestions = PROPS_SPELL_CHECKER.correct(k)
-            suite_data.logger.error "Ignoring unrecognized property '#{k}'."
-            suite_data.logger.info "    Did you mean #{suggestions.to_sentence}?" if suggestions.size > 0
-            suite_data.logger.info "    Available properties: #{GROUP_PROPS.to_sentence}"
+            logger.error "Ignoring unrecognized property '#{k}'."
+            logger.info "    Did you mean #{suggestions.to_sentence}?" if suggestions.size > 0
+            logger.info "    Available properties: #{ALL_PROPS.to_sentence}"
           end
 
-          family = TestFamily.new asserts:            spec[:assert] || spec[:asserts],
-                                  desc:               desc,
-                                  expected_exception: spec[:raises],
-                                  expected_output:    spec[:output] || spec[:equals] || spec[:equal] || spec[:expected] || spec[:expects],
-                                  failure_expected:   spec[:pending] || spec[:fails],
-                                  input_specs:        [spec[:inputs] || spec[:input] || {}].flatten,
-                                  kind:               sym,
-                                  setups:             [spec[:setup], spec[:setups]].flatten.compact
+          params = HashUtil.normalize_props(spec.symbolize_keys, PROPS).tap { |props|
+            # These two props are easier to deal with downstream as empty arrays
+            props[:input_specs] = [props[:input_specs]].flatten.compact
+            props[:setups]      = [props[:setups]].flatten.compact
+          }.merge kind: sym,
+                  desc: desc
+
+          family = TestFamily.new **params
 
           suite_data.add_test_family family
         end
 
         define_method "#{sym}!" do |*args|
-          group       = self.send(sym, *args)
-          group.focus = true
-          group
+          family       = self.send(sym, *args)
+          family.focus = true
+          family
         end
       end
 
-
-      SPEC_GROUP_NAMES.each do |sym|
+      SPEC_FAMILY_NAMES.each do |sym|
         def_family_methods_for sym
       end
 

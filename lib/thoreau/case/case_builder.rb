@@ -10,13 +10,11 @@ module Thoreau
     # - returning a count of those skipped
     class CaseBuilder
 
+      include Logging
+
       def initialize(test_families, suite_data)
         @test_families = test_families
         @suite_data    = suite_data
-      end
-
-      def logger
-        @suite_data.logger
       end
 
       def any_focused?
@@ -29,7 +27,7 @@ module Thoreau
       end
 
       def build_test_cases!
-        logger.debug "build_test_cases!"
+        logger.debug "build_test_cases! (#{@test_families.size} families)"
 
         @test_families
           .select { |g| any_focused? && g.focused? || !any_focused? }
@@ -58,24 +56,25 @@ module Thoreau
         # generating a single test for each combination.
         #
         setup_values = fam.setups
-                        .map { |key| setup_key_to_inputs key }
-                        .reduce(Hash.new) { |m, h| m.merge(h) }
+                          .map { |key| setup_key_to_inputs key }
+                          .reduce(Hash.new) { |m, h| m.merge(h) }
 
         input_sets = fam.input_specs
-                      .map { |is| setup_values.merge(is) }
-                      .flat_map do |input_spec|
+                        .map { |is| setup_values.merge(is) }
+                        .flat_map do |input_spec|
           explode_input_specs(input_spec.keys, input_spec)
         end
+        logger.debug(">> input_specs" + fam.input_specs.map(&:to_s).join('/'))
+        logger.debug("build family cases '#{fam.desc}', #{setup_values.size} setups, #{input_sets.size} input sets")
 
         input_sets.map do |input_set|
           Thoreau::TestCase.new(
-            test_family:              fam,
+            test_family:        fam,
             input:              input_set,
             action_block:       @suite_data.action_block,
             expected_output:    fam.expected_output,
             expected_exception: fam.expected_exception,
-            asserts:            fam.asserts,
-            logger:             logger)
+            asserts:            fam.asserts)
         end
 
       end

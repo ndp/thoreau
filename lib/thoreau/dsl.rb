@@ -1,9 +1,8 @@
-require 'logger'
-
+require 'thoreau/logging'
 require 'thoreau/test_suite'
 require 'thoreau/test_case'
 require 'thoreau/case/case_builder'
-require 'thoreau/case/case_runner'
+require 'thoreau/case/suite_runner'
 require 'thoreau/dsl/groups_support'
 require 'thoreau/dsl/suite_context'
 require 'thoreau/dsl/groups'
@@ -14,20 +13,18 @@ at_exit do
 end
 
 module Thoreau
+
   module DSL
 
-    attr_reader :logger
+    include Thoreau::Logging
+
     attr_reader :suite_data
 
     def test_suite name = nil, focus: false, &block
-      @logger      = Logger.new(STDOUT, formatter: proc { |severity, datetime, progname, msg|
-        "#{severity}: #{msg}\n"
-      })
-      logger.level = Logger::INFO
-      logger.level = Logger::DEBUG if ENV['DEBUG']
 
-      @suite_data = TestSuiteData.new logger
-      @context = Thoreau::DSL::SuiteContext.new(name, @suite_data, @logger)
+      @suite_data = TestSuiteData.new
+
+      @context    = Thoreau::DSL::SuiteContext.new(name, @suite_data)
       @context.instance_eval(&block)
 
       appendix_block = @suite_data.appendix_block
@@ -36,7 +33,7 @@ module Thoreau
       cases_block = @suite_data.cases_block
       Thoreau::DSL::Groups.new(@context, &cases_block) unless cases_block.nil?
 
-      TestSuite.new(context: @context, focus: focus, logger: logger, name: name)
+      TestSuite.new(context: @context, focus: focus, name: name)
     end
 
     def xtest_suite name = nil, &block

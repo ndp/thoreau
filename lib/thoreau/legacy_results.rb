@@ -1,5 +1,6 @@
 require 'logger'
 require 'json'
+require "pstore"
 
 module Thoreau
 
@@ -15,30 +16,33 @@ module Thoreau
       super
     end
 
-    def fetch(test_family, input)
+    def key_for(test_family, input)
       o = {
         kind:  test_family.kind,
         desc:  test_family.desc,
         input: input
       }
-      key =o.to_json
-      puts '****'*100
-      puts key
+      o.to_json
+    end
+
+    def fetch(test_family, input)
+      wiki = PStore.new("#{file_name}.pstore")
+      wiki.transaction do
+        wiki[key_for(test_family, input)]
+      end
     end
 
     def legacy_result(test_case) end
 
     def file_name
-      './sample-data.json'
+      'sample-data'
     end
 
-    def write
-      File.write(file_name, JSON.dump(@data_hash))
-    end
-
-    def read
-      file       = File.read(file_name)
-      @data_hash = JSON.parse(file)
+    def write test_family, input, result
+      wiki = PStore.new("#{file_name}.pstore")
+      wiki.transaction do
+        wiki[key_for(test_family, input)] = result
+      end
     end
 
   end

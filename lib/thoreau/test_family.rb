@@ -37,6 +37,10 @@ module Thoreau
       @focus
     end
 
+    def to_s
+      "#{@desc||"#{@kind} #{(@input_specs.map &:to_s).to_sentence }"}"
+    end
+
   end
 end
 

@@ -1,17 +1,15 @@
 module Thoreau
   module Case
-    class CaseRunner
+    class SuiteRunner
 
-      def initialize(context)
-        @context = context
-      end
+      include Logging
 
-      def logger
-        @context.logger
+      def initialize(name)
+        @suite_name = name
       end
 
       def run_test_cases! cases, skipped
-        logger.info "  § #{@context.name} §"
+        logger.info "  § #{@suite_name} §"
         cases.each do |c|
           if c.ok?
             logger.info "  ✓ #{c.desc}"

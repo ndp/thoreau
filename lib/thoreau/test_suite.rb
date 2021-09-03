@@ -2,13 +2,11 @@ module Thoreau
   class TestSuite
 
     attr_reader :name
-    attr_reader :logger
 
     @@suites = []
 
-    def initialize(context:, logger:, name:, focus:)
+    def initialize(context:, name:, focus:)
       @context = context
-      @logger  = logger
       @name    = name
       @focus   = focus
       @@suites << self
@@ -20,7 +18,7 @@ module Thoreau
     def build_and_run
       cases = @builder.build_test_cases!
 
-      runner = Thoreau::Case::CaseRunner.new @context
+      runner = Thoreau::Case::SuiteRunner.new @context.name
       runner.run_test_cases! cases,
                              @builder.skipped_count # for reporting
     end
@@ -35,7 +33,7 @@ module Thoreau
         if suite.focused? || run_all
           suite.build_and_run
         else
-          suite.logger.info("Suite '#{suite.name}' skipped (unfocused)")
+          logger.info("Suite '#{suite.name}' skipped (unfocused)")
         end
       end
     end

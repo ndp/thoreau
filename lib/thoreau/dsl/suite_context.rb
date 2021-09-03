@@ -5,18 +5,18 @@ module Thoreau
 
     class SuiteContext
 
+      include Thoreau::Logging
+
       attr_reader :suite_data
       attr_reader :name
-      attr_reader :logger
 
-      def initialize name, data, logger
+      def initialize name, data
         @name   = name
-        @logger = logger
         @suite_data   = data
       end
 
       def action(&block)
-        logger.debug "adding action block"
+        logger.debug "Adding action block"
         @suite_data.action_block = block
       end
 
