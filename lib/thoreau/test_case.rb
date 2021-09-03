@@ -1,13 +1,12 @@
 require 'active_support/core_ext/module/delegation'
 require_relative './case/context_builder'
-require_relative './expectation'
+require_relative './outcome'
 require_relative './legacy_results'
 
 module Thoreau
   class TestCase
 
     include Thoreau::Logging
-
 
     def initialize test_family:,
                    input:,
@@ -38,16 +37,16 @@ module Thoreau
 
       if @expectation.exception
 
-        logger.debug " -> Expected Exception #{@expectation.exception} @raised_exception:#{@raised_exception}"
+        logger.debug " -> Expected Exception #{@expectation.exception} @actual.exception:#{@actual.exception}"
 
-        if @raised_exception.to_s == @expectation.exception.to_s
+        if @actual.exception.to_s == @expectation.exception.to_s
           nil
-        elsif @raised_exception.nil?
+        elsif @actual.exception.nil?
           "Expected exception, but none raised"
-        elsif @raised_exception.is_a?(NameError)
-          "Did you forget to define an input? Error: #{@raised_exception}"
+        elsif @actual.exception.is_a?(NameError)
+          "Did you forget to define an input? Error: #{@actual.exception}"
         else
-          "Expected '#{@expectation.exception}' exception, but raised '#{@raised_exception}' (#{@raised_exception.class.name})"
+          "Expected '#{@expectation.exception}' exception, but raised '#{@actual.exception}' (#{@actual.exception.class.name})"
         end
 
       elsif @assert_proc
@@ -57,12 +56,12 @@ module Thoreau
         @assert_result ? nil : "Assertion failed. (got #{@assert_result})"
       else
 
-        logger.debug " -> Result expected: result=#{@result} expected_output: #{@expectation.output} @raised_exception:#{@raised_exception}"
+        logger.debug " -> Result expected: result=#{@actual.output} expected_output: #{@expectation.output} @actual.exception:#{@actual.exception}"
 
-        if @raised_exception
-          "Expected output, but raised exception '#{@raised_exception}'"
-        elsif @expectation.output != @result
-          "Expected '#{@expectation.output}', but got '#{@result}'"
+        if @actual.exception
+          "Expected output, but raised exception '#{@actual.exception}'"
+        elsif @expectation.output != @actual.output
+          "Expected '#{@expectation.output}', but got '#{@actual.output}'"
         else
           nil
         end
@@ -83,16 +82,17 @@ module Thoreau
       context         = context_builder.create_context
       begin
         # Only capture exceptions around the action itself.
-        @result = context.instance_exec(&(@action_block))
+        output  = context.instance_exec(&(@action_block))
+        @actual = Outcome.new output: output
       rescue Exception => e
-        @raised_exception = e
+        @actual = Outcome.new exception: e
         return
       ensure
         @ran = true
       end
 
-      @expectation.evaluate(@result, context)
-      @assert_result = context.instance_exec(@result, &(@assert_proc)) if @assert_proc
+      @expectation.evaluate(@actual.output, context)
+      @assert_result = context.instance_exec(@actual.output, &(@assert_proc)) if @assert_proc
     end
 
   end
