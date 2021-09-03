@@ -12,10 +12,10 @@ module Thoreau
 
       include Logging
 
-      def initialize(action_block:, test_families:, setups:)
+      def initialize(action_block:, test_families:, appendix:)
         @test_families = test_families
-        @action_block = action_block
-        @setups = setups
+        @action_block  = action_block
+        @appendix      = appendix
       end
 
       def any_focused?
@@ -31,17 +31,15 @@ module Thoreau
         logger.debug "build_test_cases! (#{@test_families.size} families)"
 
         @test_families
-          .select { |g| any_focused? && g.focused? || !any_focused? }
-          .flat_map do |g|
-          build_family_cases g
-        end
+          .select { |fam| any_focused? && fam.focused? || !any_focused? }
+          .flat_map { |fam| build_family_cases fam }
       end
 
       private
 
       def setup_key_to_inputs key
-        setup = @setups[key.to_s]
-        raise "Unrecognized setup context '#{key}'. Available: #{@setups.keys.to_sentence}" if setup.nil?
+        setup = @appendix.setups[key.to_s]
+        raise "Unrecognized setup context '#{key}'. Available: #{@appendix.setups.keys.to_sentence}" if setup.nil?
 
         return setup.values if setup.block.nil?
 

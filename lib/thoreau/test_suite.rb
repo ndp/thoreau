@@ -1,3 +1,5 @@
+require_relative './appendix'
+
 module Thoreau
   class TestSuite
 
@@ -11,8 +13,10 @@ module Thoreau
       @focus = focus
       @@suites << self
 
+      appendix = Thoreau::Appendix.new(setups: @data.setups)
+
       @builder = Thoreau::Case::CaseBuilder.new action_block:  @data.action_block,
-                                                setups:        @data.setups,
+                                                appendix:      appendix,
                                                 test_families: @data.test_families
     end
 
