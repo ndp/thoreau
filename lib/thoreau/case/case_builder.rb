@@ -12,9 +12,10 @@ module Thoreau
 
       include Logging
 
-      def initialize(test_families, suite_data)
+      def initialize(action_block:, test_families:, setups:)
         @test_families = test_families
-        @suite_data    = suite_data
+        @action_block = action_block
+        @setups = setups
       end
 
       def any_focused?
@@ -39,8 +40,8 @@ module Thoreau
       private
 
       def setup_key_to_inputs key
-        setup = @suite_data.setups[key.to_s]
-        raise "Unrecognized setup context '#{key}'. Available: #{@suite_data.setups.keys.to_sentence}" if setup.nil?
+        setup = @setups[key.to_s]
+        raise "Unrecognized setup context '#{key}'. Available: #{@setups.keys.to_sentence}" if setup.nil?
 
         return setup.values if setup.block.nil?
 
@@ -71,7 +72,7 @@ module Thoreau
           Thoreau::TestCase.new(
             test_family:        fam,
             input:              input_set,
-            action_block:       @suite_data.action_block,
+            action_block:       @action_block,
             expected_output:    fam.expected_output,
             expected_exception: fam.expected_exception,
             asserts:            fam.asserts)

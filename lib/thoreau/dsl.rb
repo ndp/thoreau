@@ -33,7 +33,7 @@ module Thoreau
       cases_block = @suite_data.cases_block
       Thoreau::DSL::Groups.new(@context, &cases_block) unless cases_block.nil?
 
-      TestSuite.new(context: @context, focus: focus, name: name)
+      TestSuite.new(name: name, data: @suite_data, focus: focus)
     end
 
     def xtest_suite name = nil, &block

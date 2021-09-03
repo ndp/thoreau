@@ -5,20 +5,21 @@ module Thoreau
 
     @@suites = []
 
-    def initialize(context:, name:, focus:)
-      @context = context
-      @name    = name
-      @focus   = focus
+    def initialize(data:, name:, focus:)
+      @data  = data
+      @name  = name
+      @focus = focus
       @@suites << self
 
-      @builder = Thoreau::Case::CaseBuilder.new @context.suite_data.test_families,
-                                                @context.suite_data
+      @builder = Thoreau::Case::CaseBuilder.new action_block:  @data.action_block,
+                                                setups:        @data.setups,
+                                                test_families: @data.test_families
     end
 
     def build_and_run
       cases = @builder.build_test_cases!
 
-      runner = Thoreau::Case::SuiteRunner.new @context.name
+      runner = Thoreau::Case::SuiteRunner.new @name
       runner.run_test_cases! cases,
                              @builder.skipped_count # for reporting
     end
