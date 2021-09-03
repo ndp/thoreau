@@ -38,7 +38,7 @@ module Thoreau
     end
 
     def to_s
-      "#{@desc||"#{@kind} #{(@input_specs.map &:to_s).to_sentence }"}"
+      "#{@desc||"#{@kind} #{(@input_specs.map &:to_s).to_sentence } expect #{expected_output}"}"
     end
 
   end

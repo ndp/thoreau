@@ -11,6 +11,7 @@ module Thoreau
       attr_reader :name
 
       def initialize name, data
+        raise "Suites must have (unique) names." if name.blank?
         @name   = name
         @suite_data   = data
       end

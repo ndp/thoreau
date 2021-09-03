@@ -12,11 +12,15 @@ module Thoreau
       if output.is_a?(Proc)
         @expected_output_proc = output
       elsif output == :legacy
-        @legacy_output = nil #LegacyResults.new.fetch(test_family, input)
+        @legacy_output = true #LegacyResults.new.fetch(test_family, input)
       else
         @output = output
       end
       @exception = exception
+    end
+
+    def legacy_output?
+      !!@legacy_output
     end
 
     def evaluate(result, context)

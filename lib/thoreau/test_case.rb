@@ -8,6 +8,9 @@ module Thoreau
 
     include Thoreau::Logging
 
+    attr_reader :actual, :family_desc, :input
+    attr_accessor :expectation
+
     def initialize family_desc:,
                    input:,
                    action_block:,

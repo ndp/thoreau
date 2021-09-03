@@ -47,7 +47,7 @@ module Thoreau
                   desc: desc
 
           family = TestFamily.new **params
-
+          logger.debug "created new family #{params.inspect}"
           suite_data.add_test_family family
         end
 

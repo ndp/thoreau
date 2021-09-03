@@ -9,8 +9,25 @@ module Thoreau
       end
 
       def run_test_cases! cases, skipped
+        legacy_results = LegacyResults.new(@suite_name)
         logger.info "  § #{@suite_name} §"
         cases.each do |c|
+
+
+          if c.expectation.legacy_output?
+            if legacy_results.has_saved_legacy_expectation?(c)
+              logger.info "    loading legacy data"
+              c.expectation = legacy_results.load_legacy_expectation c
+            else
+              logger.info "    no legacy data... running..."
+              c.run
+              legacy_results.save_legacy_expectation(c)
+              logger.info "  + #{c.desc} saved legacy output!"
+            end
+          end
+
+          c.run
+
           if c.ok?
             logger.info "  ✓ #{c.desc}"
           else
