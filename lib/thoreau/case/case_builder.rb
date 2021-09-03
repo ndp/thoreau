@@ -67,13 +67,14 @@ module Thoreau
         logger.debug("build family cases '#{fam.desc}', #{setup_values.size} setups, #{input_sets.size} input sets")
 
         input_sets.map do |input_set|
-          Thoreau::TestCase.new(
-            test_family:        fam,
-            input:              input_set,
-            action_block:       @action_block,
-            expected_output:    fam.expected_output,
-            expected_exception: fam.expected_exception,
-            asserts:            fam.asserts)
+          expectation = Expectation.new output:    fam.expected_output,
+                                        exception: fam.expected_exception
+
+          Thoreau::TestCase.new test_family:  fam,
+                                input:        input_set,
+                                action_block: @action_block,
+                                expectation:  expectation,
+                                asserts:      fam.asserts
         end
 
       end

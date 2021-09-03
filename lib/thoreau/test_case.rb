@@ -1,5 +1,6 @@
 require 'active_support/core_ext/module/delegation'
 require_relative './case/context_builder'
+require_relative './expectation'
 require_relative './legacy_results'
 
 module Thoreau
@@ -7,50 +8,46 @@ module Thoreau
 
     include Thoreau::Logging
 
+
     def initialize test_family:,
                    input:,
                    action_block:,
-                   expected_output:,
-                   expected_exception:,
+                   expectation:,
                    asserts:
 
       @test_family  = test_family
-      @input  = input
+      @input        = input
       @action_block = action_block
-      if expected_output.is_a?(Proc)
-        @expected_output_proc = expected_output
-      elsif expected_output == :legacy
-        @expected_legacy_output = LegacyResults.new.fetch(test_family, input)
-      else
-        @expected_output = expected_output
-      end
-      @expected_exception = expected_exception
-      @assert_proc        = asserts
-      @ran                = false
+
+      @expectation = expectation
+
+      @assert_proc = asserts
+
+      @ran = false
     end
 
     delegate :failure_expected?, to: :@test_family
 
     def desc
-      "#{@test_family.kind}:  #{@test_family.desc} #{(@input == {} ? nil : @input.sort.to_h) || @expected_exception || "(no args)"}"
+      "#{@test_family.kind}:  #{@test_family.desc} #{(@input == {} ? nil : @input.sort.to_h) || @expectation.exception || "(no args)"}"
     end
 
     def problem
 
       run unless @ran
 
-      if @expected_exception
+      if @expectation.exception
 
-        logger.debug " -> Expected Exception #{@expected_exception} @raised_exception:#{@raised_exception}"
+        logger.debug " -> Expected Exception #{@expectation.exception} @raised_exception:#{@raised_exception}"
 
-        if @raised_exception.to_s == @expected_exception.to_s
+        if @raised_exception.to_s == @expectation.exception.to_s
           nil
         elsif @raised_exception.nil?
           "Expected exception, but none raised"
         elsif @raised_exception.is_a?(NameError)
           "Did you forget to define an input? Error: #{@raised_exception}"
         else
-          "Expected '#{@expected_exception}' exception, but raised '#{@raised_exception}' (#{@raised_exception.class.name})"
+          "Expected '#{@expectation.exception}' exception, but raised '#{@raised_exception}' (#{@raised_exception.class.name})"
         end
 
       elsif @assert_proc
@@ -60,12 +57,12 @@ module Thoreau
         @assert_result ? nil : "Assertion failed. (got #{@assert_result})"
       else
 
-        logger.debug " -> Result expected: result=#{@result} @expected_output: #{@expected_output} @raised_exception:#{@raised_exception}"
+        logger.debug " -> Result expected: result=#{@result} expected_output: #{@expectation.output} @raised_exception:#{@raised_exception}"
 
         if @raised_exception
           "Expected output, but raised exception '#{@raised_exception}'"
-        elsif @expected_output != @result
-          "Expected '#{@expected_output}', but got '#{@result}'"
+        elsif @expectation.output != @result
+          "Expected '#{@expectation.output}', but got '#{@result}'"
         else
           nil
         end
@@ -94,8 +91,8 @@ module Thoreau
         @ran = true
       end
 
-      @assert_result   = context.instance_exec(@result, &(@assert_proc)) if @assert_proc
-      @expected_output = context.instance_exec(@result, &(@expected_output_proc)) if @expected_output_proc
+      @expectation.evaluate(@result, context)
+      @assert_result = context.instance_exec(@result, &(@assert_proc)) if @assert_proc
     end
 
   end
