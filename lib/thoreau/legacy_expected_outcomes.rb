@@ -4,11 +4,15 @@ require "pstore"
 
 module Thoreau
 
-  class LegacyResult
+  class LegacyExpectedOutcomes
 
-  end
-
-  class LegacyResults
+    # A simple store of expected outcomes of test cases.
+    #
+    # They are stored in a "pstore" database, with the test descriptor
+    # and inputs being the key. If you change the input of the test, it
+    # should generate a new saved result.
+    #
+    # Set ENV['RESET_SNAPSHOTS'] to, well, reset all the snapshots.
 
     VERSION = 1
 

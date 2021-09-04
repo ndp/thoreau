@@ -9,6 +9,7 @@ module Thoreau
                 :kind,
                 :setups
     attr_writer :focus
+    attr_accessor :use_legacy_snapshot
 
     def initialize(asserts:,
                    desc:,

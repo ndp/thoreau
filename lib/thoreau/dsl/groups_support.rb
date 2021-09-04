@@ -9,7 +9,7 @@ module Thoreau
     SPEC_FAMILY_NAMES = %i[happy sad spec edge edges boundary corner gigo]
     # gigo = garbage in / garbage out
     #
-    PROPS       = {
+    PROPS               = {
       asserts:            %i[assert asserts post post_condition],
       expected_exception: %i[raises],
       expected_output:    %i[equals equal expected expect expects output],
@@ -17,7 +17,7 @@ module Thoreau
       input_specs:        %i[input inputs],
       setups:             %i[setup setups]
     }
-    ALL_PROPS = PROPS.values.flatten.map(&:to_s)
+    ALL_PROPS           = PROPS.values.flatten.map(&:to_s)
     PROPS_SPELL_CHECKER = DidYouMean::SpellChecker.new(dictionary: ALL_PROPS)
 
     module GroupsSupport
@@ -47,6 +47,9 @@ module Thoreau
                   desc: desc
 
           family = TestFamily.new **params
+
+          yield family if block_given?
+
           logger.debug "created new family #{params.inspect}"
           suite_data.add_test_family family
         end
@@ -62,12 +65,19 @@ module Thoreau
         def_family_methods_for sym
       end
 
-      def expanded(a)
-        Thoreau::DSL::Expanded.new(a)
+      def_family_methods_for :legacy do |r|
+        r.use_legacy_snapshot = true
       end
 
-      def legacy_values(k = nil)
-        :legacy # some sort of legacy marker
+      alias legacy_spec legacy
+      alias legacy_test legacy
+      alias legacy_code   legacy
+      alias legacy_spec! legacy!
+      alias legacy_test! legacy!
+      alias legacy_code! legacy!
+
+      def expanded(a)
+        Thoreau::DSL::Expanded.new(a)
       end
 
     end

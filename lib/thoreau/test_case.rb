@@ -1,7 +1,7 @@
 require 'active_support/core_ext/module/delegation'
 require_relative './case/context_builder'
 require_relative './outcome'
-require_relative './legacy_results'
+require_relative './legacy_expected_outcomes'
 
 module Thoreau
   class TestCase
@@ -18,10 +18,10 @@ module Thoreau
                    asserts:,
                    negativo:
 
-      @family_desc    = family_desc
-      @input          = input
-      @action_block   = action_block
-      @negativo = negativo
+      @family_desc  = family_desc
+      @input        = input
+      @action_block = action_block
+      @negativo     = negativo
 
       @expectation = expectation
 
@@ -98,7 +98,7 @@ module Thoreau
         @ran = true
       end
 
-      @expectation.evaluate(@actual.output, context)
+      @expectation.evaluate(@actual.output, context) unless @expectation == :use_legacy_snapshot
       @assert_result = context.instance_exec(@actual.output, &(@assert_proc)) if @assert_proc
     end
 

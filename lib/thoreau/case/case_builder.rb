@@ -67,8 +67,10 @@ module Thoreau
         logger.debug("build family cases '#{fam.desc}', #{setup_values.size} setups, #{input_sets.size} input sets")
 
         input_sets.map do |input_set|
-          expectation = Outcome.new output:    fam.expected_output,
-                                    exception: fam.expected_exception
+          expectation = fam.use_legacy_snapshot ?
+                          :use_legacy_snapshot :
+                          Outcome.new(output:    fam.expected_output,
+                                      exception: fam.expected_exception)
 
           Thoreau::TestCase.new family_desc:  "#{fam.kind.to_s.ljust(8)}  #{fam.desc}",
                                 input:        input_set,

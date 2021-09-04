@@ -19,7 +19,7 @@ def gcd(a, b)
   return a
 end
 
-suite do
+suite 'greatest common divisor' do
   testing do
     gcd(a, b)
   end
