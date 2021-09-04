@@ -63,6 +63,7 @@ module Thoreau
                         .flat_map do |input_spec|
           explode_input_specs(input_spec.keys, input_spec)
         end
+        input_sets = [{}] if input_sets.size == 0
         logger.debug(">> input_specs" + fam.input_specs.map(&:to_s).join('/'))
         logger.debug("build family cases '#{fam.desc}', #{setup_values.size} setups, #{input_sets.size} input sets")
 
