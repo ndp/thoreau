@@ -1,3 +1,6 @@
+require 'rainbow/refinement'
+using Rainbow
+
 module Thoreau
   module Case
     class SuiteRunner
@@ -10,7 +13,7 @@ module Thoreau
 
       def run_test_cases! cases, skipped
         legacy_data = LegacyExpectedOutcomes.new(@suite_name)
-        logger.info "     #{@suite_name}"
+        logger.info "     #{@suite_name.underline.bright}"
         cases.each do |c|
 
           legacy = c.expectation == :use_legacy_snapshot
@@ -31,7 +34,8 @@ module Thoreau
           if c.ok?
             logger.info "  #{legacy ? '▶️ ' : '✓ ' } #{c.desc.capitalize}"
           else
-            logger.error "❓  #{c.desc.capitalize}, #{c.problem}"
+            logger.error "❓  #{c.desc.capitalize.bright}"
+            logger.error "    #{c.problem.red.bright}"
           end
         end
         logger.info (summary cases, skipped)
@@ -46,7 +50,7 @@ module Thoreau
         if failed == 0
           "  ∴  No problems detected 👌🏾 #{skipped > 0 ? "#{skipped} skipped." : ""}"
         else
-          " 🛑  #{failed} problem(s) detected.  [#{ok} of #{total} OK#{skipped > 0 ? ", #{skipped} skipped" : ""}.]"
+          " 🛑  #{failed} problem(s) detected.  [#{ok} of #{total} OK#{skipped > 0 ? ", #{skipped} skipped" : ""}.]".bright
         end
 
       end
