@@ -29,28 +29,24 @@ module Thoreau
     end
 
     def has_saved_for? test_case
-      logger.debug("Looking for saved expectations for #{key_for(test_case)}")
+      logger.debug("has_saved_for? for #{key_for(test_case)}")
       !!(load_for test_case)
     end
 
     def load_for test_case
-      wiki = PStore.new("#{file_name}.pstore")
+      logger.debug("load_for for #{key_for(test_case)}")
+      wiki = PStore.new(Thoreau.configuration.legacy_outcome_path)
       wiki.transaction do
         wiki[key_for(test_case)]
       end
     end
 
     def save! test_case
-      wiki = PStore.new("#{file_name}.pstore")
+      logger.debug("save! for #{key_for(test_case)}")
+      wiki = PStore.new(Thoreau.configuration.legacy_outcome_path)
       wiki.transaction do
         wiki[key_for(test_case)] = test_case.actual
       end
-    end
-
-    private
-
-    def file_name
-      'sample-data'
     end
 
   end

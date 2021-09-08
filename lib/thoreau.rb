@@ -1,10 +1,16 @@
 require_relative 'thoreau/version'
 require_relative 'thoreau/dsl'
+require_relative 'thoreau/configuration'
 
 module Thoreau
-  class Error < StandardError;
+  def self.configure &block
+    block.call configuration
   end
-  # Your code goes here...
+
+  def self.configuration
+    @configuration ||= Configuration.new
+  end
+
 end
 
 if defined?(RSpec)
