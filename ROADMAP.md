@@ -5,8 +5,11 @@
 * [x] dynamic expects blocks
 * [x] Multiple inputs support
 * [x] focus on tests with a bang "happy!"
-* [-] Legacy support
-* if there are no assertions, warn, "Do you want me to remember this for a legacy values?"
+* [x] Legacy support
+* [ ] group of tests within suite, `test_cases`
+* [ ] allow expectations in the appendix
+* [ ] if there are no assertions, warn, "Do you want me to remember this for a legacy values?"
+* [ ] test multiple outputs from the same setups
 * Tighten up errors
   * [ ] complain if there's no testing/subject
   * [ ] warns about unused setups
