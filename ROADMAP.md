@@ -7,10 +7,12 @@
 * [x] focus on tests with a bang "happy!"
 * [x] Legacy support
 * [x] group of tests within suite, `test_cases`
-* [ ] fix autorun
+* [x] fix autorun
+* [ ] test names can be pending or fails
+* [ ] version Snapshot code
 * [ ] allow expectations in the appendix
-* [ ] make errors like nice (remove ` for #<#<Class:0x00007fc611a10e58>:0x00007fc611a10e08>`)
 * [ ] embedded documentatoin as part of the test
+* [ ] make errors like nice (remove ` for #<#<Class:0x00007fc611a10e58>:0x00007fc611a10e08>`)
 * [ ] if there are no assertions, warn, "Do you want me to remember this for a legacy values?"
 * [ ] test multiple outputs from the same setups
 * Tighten up errors
@@ -27,6 +29,7 @@
 Production ready?
 * [ ] EXIT code 1 if failures
 * [ ] Formatters for reporting
+* [ ] command line tool
 
 
 ## Glossary
