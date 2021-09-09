@@ -1,4 +1,5 @@
-# Thoreau  <img src='https://travis-ci.org/ndp/thoreau.svg?branch=master' />
+
+# Thoreau
 
 A more thoughtful test framework
 
@@ -6,24 +7,24 @@ A more thoughtful test framework
 
 ## Installation
 
-Add `gem 'thoreau'` to your application's Gemfile, or `gem install thoreau`. Neither Rails nor another test framework is required.
+Add `gem 'thoreau'` to your application's Gemfile, or `gem install thoreau`. Neither Rails nor another test framework are required.
 
 ## Usage
 
 Create a Ruby file. Here's an `example.rb`:
 
 ```ruby
-require 'thoreau'
+require 'thoreau/autorun'
 include Thoreau::DSL
 
-suite "example suite" do
+suite "Addition regression" do
     
     testing do
         1 + 1
     end
 
     spec output: 2
-    spec output: 3
+    spec output: 3 # just to see what error detection looks like
 
 end
 ```
@@ -40,25 +41,18 @@ INFO:  🛑  1 problem(s) detected.  [1 of 2 OK.]
 
 ### The Problem
 
-When the first "xUnit" tool was invented in the last century, it was a huge step forward for developers. But besides a mild perspective
-change brought with BDD, there has not been much evolution. The current testing frameworks are written by
-developers and have a sequential, programmatic approach, even though it is sometimes obscured a bit by the words "spec"
-and "be". The advancement of nested specs brought with it a tangle of setup blocks, hierarchies, and unclear intent.
+When Kent Beck ran his first test through xUnit in the 1990s, it was a huge step forward. But since then, there's been little evolution. We have had a mild perspective
+shift brought about with BDD. And we've had many incremental improvements around the edges: parallelism, mocking, seeding, hosted CI services. Cucumber/Gherkin and Gauge are great in how they provide a way to write natural language tests. Each of the several dozen tools I've used over the years have brought incremental improvements. And these tests have allowed us to create amazing and amazingly complex software systems that would have been impossible without these tools.
 
-From our tools, our mental models is that tests are a series of steps. Yet we have learned from other programming paradigms, like
-declarative and functional programming, that focusing on intent can be more concise than the steps.
+But the current testing frameworks continue the sequential programmatic approach introduced with the first run of a test. We use the words "spec", "be", and "describe", but under the hood we are writing more sequential code to test our production code. As systems grow, the complexity of the tests scales linearly, and it's not uncommon to see a tangle of setup blocks, hierarchies, and unclear intent. This complexity has even led to small anti-testing factions within the industry.
 
-As an expert in testing, I've written thousands of tests, used code coverage and branch/logic coverage tools to improve
-my tests, and written tests in JUnit, TestUnit, Jest, Jasmine, Jest, Cucumber, Guage, Selenium, Capybara, and many more.
-I'm a huge proponent of testing and see it's value on all my projects, but it has only been a few times where I succeeded in creating a clear and maintainable suite of tests.
+In the last 25 years, we've seen sequential programming wane, in favor of declarative and functional programming. These paradigms allow the developer to focus more on intent. Why not bring this to the testing world?
 
-There has been some out-of-the-box thinking. Cucumber/Gherkin and Gauge are great in how they provide a way to write natural language tests. This is laudable goal,
-but end up separating each test into multiple files (at least two). In a magical world where product managers write your
-cucumber files, that'd be great, but as a developer writing tests, this is a step backwards in maintainability. From my
-experience, they become long narratives or streams of consciousness, which leave the reader begging for some more
-structure, and nobody wants to maintain them.
-
-Thoreau attempts to start over and present a new paradigm, based on not a programmer, but a testing perspective.
+Thoreau is an experiment-- a proof of concept-- to imagine what it would be like if we started over and discovered TDD today, knowing what we know. The problems it attempts to address:
+* As systems grow complex, developers will have trouble keeping track of exactly what they are testing with each test. Breaking open someone else's test suite should reveal the scope and breadth of the tests, and most importantly lead with what code we're testing.
+* In order to deal with complexity, we've needed complex test setups, and organizing these has been ad-hoc. Setup code is found at the beginning of each spec, and then refactored out into shared setup blocks that are sometimes hard to find.
+* In some tools, a whole world of helpful "matchers" is used, creating friction in writing tests. 
+* Much of the code we deal with is legacy code. But the tools are created to help a developer quickly scaffold a set of regression tests for an unknown blob of code.
 
 ### Structure
 
@@ -78,7 +72,7 @@ run are explicitly listed by name.
 
 ### New Terminology?
 
-* Name your test based on the type of test, eg. happy sad spec edge edges boundary corner gigo
+* Name your test based on the type of test, eg. happy, sad, spec, edge, edges, boundary, corner, gigo, etc.
 * Focus on specific tests while you develop. Like the `:focus` in some frameworks, in Thoreau, just add an exclamation
   mark, eg. `suite` to `suite!` or `spec` to `spec!`
 
@@ -122,6 +116,10 @@ the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 Everyone interacting in the Thoreau project’s codebases, issue trackers, chat rooms and mailing lists is expected to
 follow the [code of conduct](https://github.com/ndp/thoreau/blob/master/CODE_OF_CONDUCT.md).
+
+## Credits
+
+* Woodcut Image: Grindall Reynolds, CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via Wikimedia Commons
 
 
 ## le archive
