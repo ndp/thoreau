@@ -1,4 +1,5 @@
 require_relative '../test_suite_data'
+require 'active_support/core_ext/module/delegation'
 
 module Thoreau
   module DSL
@@ -8,36 +9,35 @@ module Thoreau
       include Thoreau::Logging
 
       attr_reader :suite_data
-      attr_reader :name
+      attr_reader :test_clan_model
 
-      def initialize name, data
-        raise "Suites must have (unique) names." if name.blank?
-        @name   = name
-        @suite_data   = data
+      def initialize suite_data:, test_clan_model:
+        raise "Suites must have (unique) names." if suite_data.name.blank?
+        @suite_data = suite_data
+        @test_clan_model  = test_clan_model
       end
 
-      def action(&block)
-        logger.debug "Adding action block"
-        @suite_data.action_block = block
-      end
+      delegate :name, to: :suite_data
 
-      alias testing action
-      alias subject action
-
-      def cases(&block)
-        logger.debug "adding cases"
-        @suite_data.cases_block = block
+      def cases(name = nil, &block)
+        name = self.suite_data.name if name.nil?
+        logger.debug "   + adding cases named `#{name}`"
+        @suite_data.test_cases_blocks << [name, block]
       end
 
       alias test_cases cases
 
       def appendix(&block)
-        logger.debug "adding appendix block"
+        logger.debug "   adding appendix block"
         @suite_data.appendix_block = block
       end
 
       def context
         self
+      end
+
+      def add_test_family family
+        suite_data.add_test_family family
       end
 
     end

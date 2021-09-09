@@ -102,6 +102,16 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version,
 push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
+### Terminology
+
+(Test) Case ∈ (Test) Family ∈ (Test) Clan ∈ (Test) Suite
+
+* a **clan** of tests all have the "action", or code-under-test
+* a **family** of tests all have the same setups and expections, but have different inputs. Commonly known as an *equivalence class*.
+* a **case** is a single combination of setups, inputs and executions that either is detects or does not detect a problem.
+
+Note: we avoid using the words pass, bug, error. "
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/ndp/thoreau. This project is intended to be a

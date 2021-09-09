@@ -12,10 +12,11 @@ module Thoreau
 
       include Logging
 
-      def initialize(action_block:, test_families:, appendix:)
-        @test_families = test_families
-        @action_block  = action_block
-        @appendix      = appendix
+      def initialize(test_clan:)
+        logger.debug("CaseBuilder.new #{test_clan.name} #{test_clan.test_families.size} families")
+        @test_families = test_clan.test_families
+        @action_block  = test_clan.action_block
+        @appendix      = test_clan.appendix
       end
 
       def any_focused?
@@ -28,7 +29,7 @@ module Thoreau
       end
 
       def build_test_cases!
-        logger.debug "build_test_cases! (#{@test_families.size} families)"
+        logger.debug "   build_test_cases! (#{@test_families.size} families)"
 
         @test_families
           .select { |fam| any_focused? && fam.focused? || !any_focused? }
@@ -40,7 +41,7 @@ module Thoreau
       def setup_key_to_inputs key
         setup = @appendix.setups[key.to_s]
         raise "Unrecognized setup context '#{key}'. Available: #{@appendix.setups.keys.to_sentence}" if setup.nil?
-
+        logger.debug("   setup_key_to_inputs `#{key}`: #{setup}")
         return setup.values if setup.block.nil?
 
         result = Class.new.new.instance_eval(&setup.block)
@@ -57,28 +58,29 @@ module Thoreau
         setup_values = fam.setups
                           .map { |key| setup_key_to_inputs key }
                           .reduce(Hash.new) { |m, h| m.merge(h) }
-
+        logger.debug("   -> setup_values = #{setup_values}")
+        logger.debug("   -> fam.input_specs = #{fam.input_specs}")
         input_sets = fam.input_specs
                         .map { |is| setup_values.merge(is) }
                         .flat_map do |input_spec|
           explode_input_specs(input_spec.keys, input_spec)
         end
         input_sets = [{}] if input_sets.size == 0
-        logger.debug(">> input_specs" + fam.input_specs.map(&:to_s).join('/'))
-        logger.debug("build family cases '#{fam.desc}', #{setup_values.size} setups, #{input_sets.size} input sets")
+        logger.debug("   -> input_sets: #{input_sets}")
+        logger.debug("   build cases for '#{fam.desc}', #{setup_values.size} setups, #{input_sets.size} input sets, build_family_cases")
 
         input_sets.map do |input_set|
           expectation = fam.use_legacy_snapshot ?
                           :use_legacy_snapshot :
-                          Outcome.new(output:    fam.expected_output,
-                                      exception: fam.expected_exception)
+                          Models::Outcome.new(output:    fam.expected_output,
+                                              exception: fam.expected_exception)
 
-          Thoreau::TestCase.new family_desc:  "#{fam.kind.to_s.ljust(8)}  #{fam.desc}",
-                                input:        input_set,
-                                action_block: @action_block,
-                                expectation:  expectation,
-                                asserts:      fam.asserts,
-                                negativo:     fam.failure_expected?
+          Thoreau::Models::TestCase.new family_desc:  "#{fam.kind.to_s.ljust(8)}  #{fam.desc}",
+                                        input:        input_set,
+                                        action_block: @action_block,
+                                        expectation:  expectation,
+                                        asserts:      fam.asserts,
+                                        negativo:     fam.failure_expected?
         end
 
       end

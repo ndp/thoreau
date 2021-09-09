@@ -22,6 +22,37 @@ suite "simplest tests" do
   happy output: true # or not
 end
 
+suite 'nested tests' do
+
+  test_cases 'simple nesting' do
+    subject { 1 }
+
+    happy equals: 1
+  end
+
+  test_cases 'using setup from the appendix' do
+    subject { i }
+
+    happy equals: 2, setup: 'two'
+  end
+
+  appendix do
+    setup 'two', { i: 2 }
+  end
+
+end
+
+suite 'nested tests 2' do
+  subject { 'only one' }
+
+  test 'simple test', expects: 'only one'
+
+  test_cases do
+    subject { 'is allowed' }
+    test 'suite produces error', expects: 'is allowed'
+  end
+end
+
 suite "exceptions" do
   testing { raise "poopy butt" }
 

@@ -1,4 +1,4 @@
-require_relative '../test_family'
+require_relative '../models/test_family'
 require_relative './expanded'
 require_relative '../util'
 require 'active_support/core_ext/array/conversions'
@@ -6,7 +6,7 @@ require 'active_support/core_ext/array/conversions'
 module Thoreau
   module DSL
 
-    SPEC_FAMILY_NAMES = %i[happy sad spec edge edges boundary corner gigo]
+    SPEC_FAMILY_NAMES = %i[happy sad spec test edge edges boundary corner gigo]
     # gigo = garbage in / garbage out
     #
     PROPS               = {
@@ -20,9 +20,17 @@ module Thoreau
     ALL_PROPS           = PROPS.values.flatten.map(&:to_s)
     PROPS_SPELL_CHECKER = DidYouMean::SpellChecker.new(dictionary: ALL_PROPS)
 
-    module GroupsSupport
+    module Clan
 
-      # Note: requires `suite_data`.
+      # Note: requires `@test_clan_model`.
+
+      def action(&block)
+        logger.debug "   + Adding action block"
+        @test_clan_model.action_block = block
+      end
+      alias testing action
+      alias subject action
+
 
       def self.def_family_methods_for(sym)
         define_method sym do |*args|
@@ -46,12 +54,12 @@ module Thoreau
           }.merge kind: sym,
                   desc: desc
 
-          family = TestFamily.new **params
+          family = Models::TestFamily.new **params
 
           yield family if block_given?
 
-          logger.debug "created new family #{params.inspect}"
-          suite_data.add_test_family family
+          logger.debug "   * Created new family #{params.inspect}"
+          @test_clan_model.add_test_family family
         end
 
         define_method "#{sym}!" do |*args|

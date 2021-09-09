@@ -1,30 +1,26 @@
+require_relative './models/test_clan'
+
 module Thoreau
   class TestSuiteData
 
     include Thoreau::Logging
 
-    attr_accessor :action_block
     attr_accessor :appendix_block
-    attr_accessor :cases_block
+    attr_reader :test_cases_blocks
 
-    attr_reader :test_families
-    attr_reader :setups
+    attr_reader :name
+    attr_reader :test_clans
 
-    def initialize
-      @test_families = []
-      @setups        = {}
+    def initialize name, appendix:, test_clan:
+      @name              = name
+      @appendix          = appendix
+      @test_clans        = [test_clan]
+      @test_cases_blocks = []
     end
 
     def add_setup(name, values, block)
-      raise "Duplicate setup block #{name}" unless setups[name].nil?
-      logger.debug "Adding setup block #{name}"
-      @setups[name.to_s] = Thoreau::Setup.new(name, values, block)
-    end
-
-    def add_test_family fam
-      logger.debug "Adding test family #{fam}"
-      @test_families.push fam
-      fam
+      logger.debug "   Adding setup block #{name}"
+      @appendix.add_setup Thoreau::Models::Setup.new(name, values, block)
     end
 
   end

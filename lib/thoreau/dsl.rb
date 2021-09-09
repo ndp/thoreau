@@ -1,11 +1,12 @@
 require 'thoreau/logging'
 require 'thoreau/test_suite'
-require 'thoreau/test_case'
+require 'thoreau/models/test_case'
+require 'thoreau/models/test_clan'
 require 'thoreau/case/case_builder'
 require 'thoreau/case/suite_runner'
-require 'thoreau/dsl/groups_support'
+require 'thoreau/dsl/clan'
 require 'thoreau/dsl/suite_context'
-require 'thoreau/dsl/groups'
+require 'thoreau/dsl/test_cases'
 require 'thoreau/dsl/appendix'
 
 at_exit do
@@ -14,6 +15,12 @@ end
 
 module Thoreau
 
+  class TestCasesAtMultipleLevelsError < RuntimeError
+    def initialize(msg = nil)
+      super "Test cases must be specified either at the top level or inside test_cases blocks, but not both!"
+    end
+  end
+
   module DSL
 
     include Thoreau::Logging
@@ -21,19 +28,35 @@ module Thoreau
     attr_reader :suite_data
 
     def test_suite name = nil, focus: false, &block
+      logger.debug("# Processing keyword `test_suite`")
 
-      @suite_data = TestSuiteData.new
+      appendix        = Models::Appendix.new
+      top_level_clan_model = Thoreau::Models::TestClan.new name, appendix: appendix
+      @suite_data     = TestSuiteData.new name, test_clan: top_level_clan_model, appendix: appendix
 
-      @context    = Thoreau::DSL::SuiteContext.new(name, @suite_data)
-      @context.instance_eval(&block)
+      # Evaluate all the top-level keywords: test_cases, appendix
+      @suite_context = Thoreau::DSL::SuiteContext.new suite_data:      @suite_data,
+                                                      test_clan_model: top_level_clan_model
+      logger.debug("## Evaluating suite")
+      @suite_context.instance_eval(&block)
 
+      logger.debug("## Evaluating appendix block")
       appendix_block = @suite_data.appendix_block
       Thoreau::DSL::Appendix.new(@suite_data, &appendix_block) unless appendix_block.nil?
 
-      cases_block = @suite_data.cases_block
-      Thoreau::DSL::Groups.new(@context, &cases_block) unless cases_block.nil?
+      logger.debug("## Evaluating test_cases blocks")
+      @suite_data.test_cases_blocks.each do |name, cases_block|
 
-      TestSuite.new(name: name, data: @suite_data, focus: focus)
+        raise TestCasesAtMultipleLevelsError unless @suite_data.test_clans.first.empty?
+
+        test_clan_model = Thoreau::Models::TestClan.new name,
+                                                        appendix: appendix,
+                                                        action_block: top_level_clan_model.action_block
+        Thoreau::DSL::TestCases.new(test_clan_model, &cases_block)
+        @suite_data.test_clans << test_clan_model
+      end
+
+      TestSuite.new(data: @suite_data, focus: focus)
     end
 
     def xtest_suite name = nil, &block
@@ -48,7 +71,7 @@ module Thoreau
 
     alias suite! test_suite!
 
-    include Thoreau::DSL::GroupsSupport
+    include Thoreau::DSL::Clan
 
   end
 end
