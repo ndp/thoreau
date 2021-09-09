@@ -1,12 +1,7 @@
 require 'active_support/core_ext/module/delegation'
+require_relative '../errors'
 
 module Thoreau
-
-  class OverriddenActionError < RuntimeError
-    def initialize(msg = nil)
-      super "Extra action/subject provided for tests. Actions/subjects must be specified EITHER in the `suite` or within `test_cases` (not both)."
-    end
-  end
 
   module Models
     class TestClan # set of TestFamilies

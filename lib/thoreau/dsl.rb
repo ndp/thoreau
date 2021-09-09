@@ -8,18 +8,13 @@ require 'thoreau/dsl/clan'
 require 'thoreau/dsl/suite_context'
 require 'thoreau/dsl/test_cases'
 require 'thoreau/dsl/appendix'
+require_relative './errors'
 
 at_exit do
-  Thoreau::TestSuite.run_all!
+  Thoreau::TestSuite.run_all! # TODO FIX
 end
 
 module Thoreau
-
-  class TestCasesAtMultipleLevelsError < RuntimeError
-    def initialize(msg = nil)
-      super "Test cases must be specified either at the top level or inside test_cases blocks, but not both!"
-    end
-  end
 
   module DSL
 

@@ -42,17 +42,6 @@ suite 'nested tests' do
 
 end
 
-suite 'nested tests 2' do
-  subject { 'only one' }
-
-  test 'simple test', expects: 'only one'
-
-  test_cases do
-    subject { 'is allowed' }
-    test 'suite produces error', expects: 'is allowed'
-  end
-end
-
 suite "exceptions" do
   testing { raise "poopy butt" }
 
