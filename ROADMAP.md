@@ -6,9 +6,11 @@
 * [x] Multiple inputs support
 * [x] focus on tests with a bang "happy!"
 * [x] Legacy support
-* [ ] group of tests within suite, `test_cases`
+* [x] group of tests within suite, `test_cases`
+* [ ] fix autorun
 * [ ] allow expectations in the appendix
 * [ ] make errors like nice (remove ` for #<#<Class:0x00007fc611a10e58>:0x00007fc611a10e08>`)
+* [ ] embedded documentatoin as part of the test
 * [ ] if there are no assertions, warn, "Do you want me to remember this for a legacy values?"
 * [ ] test multiple outputs from the same setups
 * Tighten up errors
