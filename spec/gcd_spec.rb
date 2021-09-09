@@ -1,23 +1,7 @@
-require 'thoreau'
+require_relative './example_code_under_test/gcd'
+require 'thoreau/auto_run'
 
 include Thoreau::DSL
-
-
-def gcd(a, b)
-  if (a == 0)
-    return b
-  end
-
-  while b != 0
-    if a > b
-      a = a - b
-    else
-      b = b - a;
-    end
-  end
-
-  return a
-end
 
 suite 'greatest common divisor' do
   testing do

@@ -10,10 +10,6 @@ require 'thoreau/dsl/test_cases'
 require 'thoreau/dsl/appendix'
 require_relative './errors'
 
-at_exit do
-  Thoreau::TestSuite.run_all! # TODO FIX
-end
-
 module Thoreau
 
   module DSL

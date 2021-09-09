@@ -75,7 +75,7 @@ module Thoreau
                           Models::Outcome.new(output:    fam.expected_output,
                                               exception: fam.expected_exception)
 
-          Thoreau::Models::TestCase.new family_desc:  "#{fam.kind.to_s.ljust(8)}  #{fam.desc}",
+          Thoreau::Models::TestCase.new family_desc:  "#{fam.kind.to_s.ljust(10).capitalize} #{fam.desc}",
                                         input:        input_set,
                                         action_block: @action_block,
                                         expectation:  expectation,

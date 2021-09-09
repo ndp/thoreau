@@ -1,6 +1,8 @@
-require 'thoreau'
+require 'thoreau/auto_run'
 include Thoreau::DSL
 
+# This idea is that this is some weird legacy code
+# that you don't understand.
 def weirdass_legacy_code(a, b, c)
   return 'b' if a < -10000
   return 'bc' if a > 10001
@@ -11,6 +13,11 @@ def weirdass_legacy_code(a, b, c)
 
 end
 
+# Backfilling tests is as easy as enumerating inputs
+# The "legacy" keyword kicks-in snapshot code that
+# records test results, similar to snapshots or VCR
+# recordings. What is saved, though, is simple, and
+# matches outputs/exceptions thrown.
 suite "legacy testing" do
   testing { weirdass_legacy_code(a, b, c) }
 

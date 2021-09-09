@@ -32,9 +32,9 @@ module Thoreau
           c.run
 
           if c.ok?
-            logger.info "  #{legacy ? '▶️ ' : '✓ ' } #{c.desc.capitalize}"
+            logger.info "  #{legacy ? '▶️ ' : '✓ ' } #{c.desc}"
           else
-            logger.error "❓  #{c.desc.capitalize.bright}"
+            logger.error "❓  #{c.desc.bright}"
             logger.error "    #{c.problem.red.bright}"
           end
         end
