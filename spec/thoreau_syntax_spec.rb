@@ -8,7 +8,7 @@ include Thoreau::DSL
 suite "test output equality" do
   # A test suite has a title
 
-  testing do
+  subject do
     # This is some code that is run for each test
     # It's the "subject" of the test suite. In this
     # case we just return "true", but you'll be
@@ -61,7 +61,7 @@ end
 
 # Expectations can be written around exceptions as well.
 suite "exceptions" do
-  testing { raise "not on my watch" }
+  subject { raise "not on my watch" }
 
   sad raises: "not on my watch"
   sad raises: "not on my iWatch", fails: true
@@ -73,7 +73,7 @@ end
 # This is always a hash of values that get turned into variables within
 # the testing block.
 suite "parameter" do
-  testing { a }
+  subject { a }
 
   happy "input parameter passes to test block", input: { a: 5 }, output: 5
   happy "'input' can have an 's' for readability", inputs: { a: 5, b: 9 }, output: 5
@@ -81,7 +81,7 @@ end
 
 # Of course multiple parameters are fine.
 suite "multiple parameters" do
-  testing { a + b }
+  subject { a + b }
 
   happy 'receives both params', inputs: { a: 1, b: 3 },
         equals:                         4
@@ -99,7 +99,7 @@ end
 # make the flow much easy to reason about.
 suite "shared setup blocks" do
 
-  testing { a + (respond_to?(:b) ? b : 0) }
+  subject { a + (respond_to?(:b) ? b : 0) }
 
   happy "when a is 5", setup: "a5", output: 5
   # happy "a5", output: 5 # if the name is the setup, use it
@@ -120,7 +120,7 @@ end
 # Using an "asserts" property allows you to do any sort of
 # comparison, as long as the function returns true or false.
 suite "expectation blocks" do
-  testing { 3 }
+  subject { 3 }
 
   happy "runs assertion block", asserts: proc { |result| result == 3 }
   happy "runs assertions (negative case)",
@@ -141,7 +141,7 @@ end
 # becomes its own test. Multiple expanded values will join
 # to create n*m test cases.
 suite "input generators" do
-  testing { i * i }
+  subject { i * i }
 
   happy inputs: { i: expanded([-1, 0, 1, 100, 1_000_000]) },
         equals: (proc { |_| i * i })

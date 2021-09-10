@@ -19,7 +19,7 @@ end
 # recordings. What is saved, though, is simple, and
 # matches outputs/exceptions thrown.
 suite "legacy testing" do
-  testing { weirdass_legacy_code(a, b, c) }
+  subject { weirdass_legacy_code(a, b, c) }
 
   legacy input: { a: -10000, b: -10, c: 8 }
   legacy input: { a: -20000, b: -10, c: 8 }

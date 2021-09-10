@@ -11,8 +11,6 @@
       left: 0;
       margin: 0;
       padding: 40px 0px 40px 20px;
-      font-size: 16px;
-      line-height: 20px;
       width: 80ex;
       white-space: pre-wrap;
     }
@@ -20,24 +18,45 @@
     code {
       background-color: black;
       color: gainsboro;
+      background-color: gainsboro;
+      color: #333;
+      background: linear-gradient(to right, gray 0px, gray 12px, gainsboro 24px);
       font-family: "Source Code Pro", Monaco, monospace;
+      /*padding-left: 270px;*/
+      margin-left: 240px;
+      font-size: 19px;
+      line-height: 32px;
+      padding-left: 30px;
     }
 
     code var {
       font-weight: 900;
+      font-style: normal;
       color: aliceblue;
+      color: #000;
     }
 
     .annotations {
-      padding-left: 40ex;
-      padding-top: 38px; /* this font needs a nudge */
-      background-color: transparent;
-      color: yellowgreen;
-      font-style: italic;
-      font-family: Serif;
+      background-color: gray;
+      padding-left: 2ex;
+      padding-top: 48px;
+      padding-right: 5px;
+      width: 240px;
+      color: navajowhite;
+      color: gainsboro;
+      /*font-style: italic;*/
+      font-family: helvetica, Serif;
+      line-height: 16px;
+      font-size: 16px;
+      text-align: right;
     }
     .annotations var {
       font-family: "Source Code Pro", Monaco, monospace;
+      font-weight: 900;
+    }
+
+    .annotations br {
+      height: 8px;
     }
 
     .annotations ul,
@@ -56,44 +75,53 @@
 <body>
 <br>
 <br>
-<code>
-<var>test_suite</var> do
+<code><var>test_suite</var> 'addition!' do
 
-  <var>testing</var> do
+  <var>subject</var> do
      a + b
   end
 
-
-  <var>spec</var> "addition works",
-       setup:  'set up a',
+  <var>spec</var> 'addition works',
+       setup:  'a is 37',
        input: { b: 5 },
        expect:  42
 
-
-
   <var>appendix</var> do
-    <var>setup</var> 'set up a',
-       { a: 37 }
+    <var>setup</var> 'a is 37',
+       { a: 32 + 4 + 1 }
   end
 end
 </code>
-<div class='annotations'>
-<var>test_suite</var> wraps a set of tests.
+<div class='annotations'><var>test_suite</var> wraps
+  a set of <var>specs</var>
 
-Describe the subject of what
-you're testing with a block up front. There's
-no need to write the perfect description
-or make readers hunt for the code.
 
-Tests are declarative with:<ul>
-      <li>name</li>
-      <li>setup (shared in the appendix)</li>
-      <li>inputs (supplement or override <var>setups</var>)</li>
-      <li>expectations for output</li></ul>
-You hide <var>setup</var> code and other
-complexities down in an <var>appendix</var>
-This helps readers understand the overall
-test approach.
+  Suites always start with
+  the <var>subject</var> block,
+  the "code under test".
+  This helps make test suites
+  easy to scan.
+
+
+
+Tests are largely declarative:
+  <i>a <var>name</var></i>,
+  <i>one or more <var>setups</var></i>,
+      <i><var>inputs</var></i>, and
+  <i>expectations for output</i>.
+  Since most assertions are
+  for equality, it's the default,
+  but free-form assertions are
+  available.
+
+  The <var>appendix</var> is a place
+  to relegate messy code, like
+  the <var>setup</var> blocks.
+
+The appendix helps readers
+  see the intent-- rather
+  than implementation-- of the
+  test suite and its tests.
 </div>
 
 </body>

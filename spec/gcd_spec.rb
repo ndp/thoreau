@@ -4,7 +4,7 @@ require 'thoreau/auto_run'
 include Thoreau::DSL
 
 suite 'greatest common divisor' do
-  testing do
+  subject do
     gcd(a, b)
   end
 

@@ -25,7 +25,7 @@ module Thoreau
       # Note: requires `@test_clan_model`.
 
       def action(&block)
-        logger.debug "   + Adding action block"
+        logger.debug "   + Adding subject block"
         @test_clan_model.action_block = block
       end
       alias testing action

@@ -89,7 +89,7 @@ module Thoreau
         context_builder = Case::ContextBuilder.new(input: @input)
         context         = context_builder.create_context
         begin
-          # Only capture exceptions around the action itself.
+          # Only capture exceptions around the subject itself.
           output  = context.instance_exec(&(@action_block))
           @actual = Models::Outcome.new output: output
         rescue Exception => e

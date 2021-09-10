@@ -16,7 +16,7 @@ include Thoreau::DSL
 
 test_suite 'triangle_type()' do
 
-  testing { triangle_type(a, b, c) }
+  subject { triangle_type(a, b, c) }
 
   test_cases 'happy paths' do
     spec 'A triangle with all equal sides is said to be an equilateral triangle.',

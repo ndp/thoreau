@@ -19,7 +19,7 @@ include Thoreau::DSL
 
 suite "Addition regression" do
     
-    testing do
+  subject do
         1 + 1
     end
 
@@ -100,7 +100,7 @@ push git commits and tags, and push the `.gem` file to [rubygems.org](https://ru
 
 (Test) Case ∈ (Test) Family ∈ (Test) Clan ∈ (Test) Suite
 
-* a **clan** of tests all have the "action", or code-under-test
+* a **clan** of tests all have the subject, or code-under-test
 * a **family** of tests all have the same setups and expections, but have different inputs. Commonly known as an *equivalence class*.
 * a **case** is a single combination of setups, inputs and executions that either is detects or does not detect a problem.
 

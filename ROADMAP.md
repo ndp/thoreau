@@ -19,7 +19,7 @@
   * [ ] complain if there's no testing/subject
   * [ ] warns about unused setups
   * [ ] warns about unused asserts
-  * [ ] complains if there's more than one testing block
+  * [ ] complains if there's more than one subject block
   * [ ] complains if there are no tests
   * [ ] what to do with a test with no expectations
 * [ ] take to right line of code with better output
