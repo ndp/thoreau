@@ -7,8 +7,8 @@ module Thoreau
 
       include Logging
 
-      def initialize(name)
-        @suite_name = name
+      def initialize(suite_name)
+        @suite_name = suite_name
       end
 
       def run_test_cases! cases, skipped
