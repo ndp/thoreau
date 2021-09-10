@@ -1,5 +1,5 @@
 require_relative './dsl'
 
 at_exit do
-  Thoreau::TestSuite.run_all!
+  Thoreau::Models::TestSuite.run_all!
 end

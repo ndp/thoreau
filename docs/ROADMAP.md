@@ -1,4 +1,6 @@
-## TODOs
+# TODOs
+
+## Technical
 
 * [x] focus on suite with a bang "suite!"
 * [x] Shared setups
@@ -8,10 +10,12 @@
 * [x] Legacy support
 * [x] group of tests within suite, `test_cases`
 * [x] fix autorun
+* [ ] remember all the runs and notice differences
 * [ ] test names can be pending or fails
 * [ ] version Snapshot code
 * [ ] allow expectations in the appendix
-* [ ] embedded documentatoin as part of the test
+* [ ] define custom test names
+* [ ] embedded documentation as part of the test
 * [ ] make errors like nice (remove ` for #<#<Class:0x00007fc611a10e58>:0x00007fc611a10e08>`)
 * [ ] if there are no assertions, warn, "Do you want me to remember this for a legacy values?"
 * [ ] test multiple outputs from the same setups
@@ -25,6 +29,13 @@
 * [ ] take to right line of code with better output
 * [ ] More assertions / flexible evaluation
 * [ ] create [minitest plugin?](https://github.com/fteem/how-to-write-minitest-extensions/blob/master/manuscript/4-writing-our-first-extension.md#adding-the-plugin)
+* [ ] typescript version
+
+## Marketing
+* [ ] Documentation
+* [ ] video of basic usage
+* [ ] case study
+* 
 
 Production ready?
 * [ ] EXIT code 1 if failures

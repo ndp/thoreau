@@ -1,10 +1,10 @@
-require_relative '../test_suite_data'
 require 'active_support/core_ext/module/delegation'
 
 module Thoreau
   module DSL
+  module Context
 
-    class SuiteContext
+    class Suite
 
       include Thoreau::Logging
 
@@ -32,15 +32,8 @@ module Thoreau
         @suite_data.appendix_block = block
       end
 
-      def context
-        self
-      end
-
-      def add_test_family family
-        suite_data.add_test_family family
-      end
-
     end
 
   end
+end
 end

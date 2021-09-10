@@ -1,13 +1,14 @@
 require 'thoreau/logging'
-require 'thoreau/test_suite'
+require 'thoreau/models/test_suite'
 require 'thoreau/models/test_case'
 require 'thoreau/models/test_clan'
 require 'thoreau/case/case_builder'
 require 'thoreau/case/suite_runner'
-require 'thoreau/dsl/clan'
-require 'thoreau/dsl/suite_context'
-require 'thoreau/dsl/test_cases'
-require 'thoreau/dsl/appendix'
+require 'thoreau/dsl/test_suite_data'
+require 'thoreau/dsl/context/clan'
+require 'thoreau/dsl/context/suite'
+require 'thoreau/dsl/context/test_cases'
+require 'thoreau/dsl/context/appendix'
 require_relative './errors'
 
 module Thoreau
@@ -23,17 +24,17 @@ module Thoreau
 
       appendix        = Models::Appendix.new
       top_level_clan_model = Thoreau::Models::TestClan.new name, appendix: appendix
-      @suite_data     = TestSuiteData.new name, test_clan: top_level_clan_model, appendix: appendix
+      @suite_data     = Thoreau::DSL::TestSuiteData.new name, test_clan: top_level_clan_model, appendix: appendix
 
       # Evaluate all the top-level keywords: test_cases, appendix
-      @suite_context = Thoreau::DSL::SuiteContext.new suite_data:      @suite_data,
+      @suite_context = Thoreau::DSL::Context::Suite.new suite_data:      @suite_data,
                                                       test_clan_model: top_level_clan_model
       logger.debug("## Evaluating suite")
       @suite_context.instance_eval(&block)
 
       logger.debug("## Evaluating appendix block")
       appendix_block = @suite_data.appendix_block
-      Thoreau::DSL::Appendix.new(@suite_data, &appendix_block) unless appendix_block.nil?
+      Thoreau::DSL::Context::Appendix.new(@suite_data, &appendix_block) unless appendix_block.nil?
 
       logger.debug("## Evaluating test_cases blocks")
       @suite_data.test_cases_blocks.each do |name, cases_block|
@@ -43,11 +44,11 @@ module Thoreau
         test_clan_model = Thoreau::Models::TestClan.new name,
                                                         appendix: appendix,
                                                         action_block: top_level_clan_model.action_block
-        Thoreau::DSL::TestCases.new(test_clan_model, &cases_block)
+        Thoreau::DSL::Context::TestCases.new(test_clan_model, &cases_block)
         @suite_data.test_clans << test_clan_model
       end
 
-      TestSuite.new(data: @suite_data, focus: focus)
+      Models::TestSuite.new(data: @suite_data, focus: focus)
     end
 
     def xtest_suite name = nil, &block
@@ -62,7 +63,7 @@ module Thoreau
 
     alias suite! test_suite!
 
-    include Thoreau::DSL::Clan
+    include Thoreau::DSL::Context::Clan
 
   end
 end
