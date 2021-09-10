@@ -4,7 +4,7 @@ require_relative './outcome'
 require_relative '../legacy_expected_outcomes'
 
 module Thoreau
-  module Models
+  module Model
     class TestCase
 
       include Thoreau::Logging
@@ -91,11 +91,11 @@ module Thoreau
         begin
           # Only capture exceptions around the subject itself.
           output  = context.instance_exec(&(@action_block))
-          @actual = Models::Outcome.new output: output
+          @actual = Model::Outcome.new output: output
         rescue Exception => e
           logger.debug("** Exception: #{e.class.name} #{e}")
           logger.debug("Available local variables: #{@input.keys.empty? ? '(none)' : @input.keys.to_sentence}") if e.is_a? NameError
-          @actual = Models::Outcome.new exception: e
+          @actual = Model::Outcome.new exception: e
           return
         ensure
           @ran = true

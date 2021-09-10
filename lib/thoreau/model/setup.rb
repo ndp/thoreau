@@ -1,5 +1,5 @@
 module Thoreau
-  module Models
+  module Model
 
     class Setup
 

@@ -72,10 +72,10 @@ module Thoreau
         input_sets.map do |input_set|
           expectation = fam.use_legacy_snapshot ?
                           :use_legacy_snapshot :
-                          Models::Outcome.new(output:    fam.expected_output,
+                          Model::Outcome.new(output:    fam.expected_output,
                                               exception: fam.expected_exception)
 
-          Thoreau::Models::TestCase.new family_desc:  "#{fam.kind.to_s.ljust(10).capitalize} #{fam.desc}",
+          Thoreau::Model::TestCase.new family_desc:  "#{fam.kind.to_s.ljust(10).capitalize} #{fam.desc}",
                                         input:        input_set,
                                         action_block: @action_block,
                                         expectation:  expectation,

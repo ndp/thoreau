@@ -1,5 +1,5 @@
 module Thoreau
-  module Models
+  module Model
     class Outcome
       # Reprents the outcome of a given test case.
       # It can either be successful and have an `output`,

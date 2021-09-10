@@ -1,4 +1,4 @@
-require_relative '../models/setup'
+require_relative '../model/setup'
 
 module Thoreau
   module DSL
@@ -21,7 +21,7 @@ module Thoreau
 
       def add_setup(name, values, block)
         logger.debug "   Adding setup block #{name}"
-        @appendix.add_setup Thoreau::Models::Setup.new(name, values, block)
+        @appendix.add_setup Thoreau::Model::Setup.new(name, values, block)
       end
 
     end

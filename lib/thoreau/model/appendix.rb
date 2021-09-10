@@ -1,5 +1,5 @@
 module Thoreau
-  module Models
+  module Model
     class Appendix
 
       attr_reader :setups

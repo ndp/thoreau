@@ -1,4 +1,4 @@
-require_relative '../../models/test_family'
+require_relative '../../model/test_family'
 require_relative '../expanded'
 require_relative '../../util'
 require 'active_support/core_ext/array/conversions'
@@ -55,7 +55,7 @@ module Thoreau
             }.merge kind: sym,
                     desc: desc
 
-            family = Models::TestFamily.new **params
+            family = Model::TestFamily.new **params
 
             yield family if block_given?
 

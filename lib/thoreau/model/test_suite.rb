@@ -3,7 +3,7 @@ require_relative './appendix'
 require_relative '../case/multi_clan_case_builder'
 
 module Thoreau
-  module Models
+  module Model
     class TestSuite
 
       @@suites = []

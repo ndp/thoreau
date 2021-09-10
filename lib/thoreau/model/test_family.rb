@@ -1,5 +1,5 @@
 module Thoreau
-  module Models
+  module Model
 
     class TestFamily
       attr_reader :asserts,

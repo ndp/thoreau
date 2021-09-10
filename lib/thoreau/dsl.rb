@@ -1,7 +1,7 @@
 require 'thoreau/logging'
-require 'thoreau/models/test_suite'
-require 'thoreau/models/test_case'
-require 'thoreau/models/test_clan'
+require 'thoreau/model/test_suite'
+require 'thoreau/model/test_case'
+require 'thoreau/model/test_clan'
 require 'thoreau/case/case_builder'
 require 'thoreau/case/suite_runner'
 require 'thoreau/dsl/test_suite_data'
@@ -22,8 +22,8 @@ module Thoreau
     def test_suite name = nil, focus: false, &block
       logger.debug("# Processing keyword `test_suite`")
 
-      appendix        = Models::Appendix.new
-      top_level_clan_model = Thoreau::Models::TestClan.new name, appendix: appendix
+      appendix        = Model::Appendix.new
+      top_level_clan_model = Thoreau::Model::TestClan.new name, appendix: appendix
       @suite_data     = Thoreau::DSL::TestSuiteData.new name, test_clan: top_level_clan_model, appendix: appendix
 
       # Evaluate all the top-level keywords: test_cases, appendix
@@ -41,14 +41,14 @@ module Thoreau
 
         raise TestCasesAtMultipleLevelsError unless @suite_data.test_clans.first.empty?
 
-        test_clan_model = Thoreau::Models::TestClan.new name,
+        test_clan_model = Thoreau::Model::TestClan.new name,
                                                         appendix: appendix,
                                                         action_block: top_level_clan_model.action_block
         Thoreau::DSL::Context::TestCases.new(test_clan_model, &cases_block)
         @suite_data.test_clans << test_clan_model
       end
 
-      Models::TestSuite.new(data: @suite_data, focus: focus)
+      Model::TestSuite.new(data: @suite_data, focus: focus)
     end
 
     def xtest_suite name = nil, &block

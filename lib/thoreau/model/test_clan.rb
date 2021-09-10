@@ -3,7 +3,7 @@ require_relative '../errors'
 
 module Thoreau
 
-  module Models
+  module Model
     class TestClan # set of TestFamilies
 
       include Thoreau::Logging
