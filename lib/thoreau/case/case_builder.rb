@@ -45,31 +45,40 @@ module Thoreau
         # generating a single test for each combination.
         #
         setup_values = @appendix.setup_values fam.setups
+
+        # calculate the inputs, expanded from the setup values above
+        input_hashes = build_input_hashes fam.input_specs, setup_values
+
         logger.debug("   -> setup_values = #{setup_values}")
         logger.debug("   -> fam.input_specs = #{fam.input_specs}")
-        input_sets = fam.input_specs
-                        .map { |is| setup_values.merge(is) }
-                        .flat_map do |input_spec|
-          explode_input_specs(input_spec.keys, input_spec)
-        end
-        input_sets = [{}] if input_sets.size == 0
-        logger.debug("   -> input_sets: #{input_sets}")
-        logger.debug("   build cases for '#{fam.desc}', #{setup_values.size} setups, #{input_sets.size} input sets, build_family_cases")
+        logger.debug("   -> input_sets: #{input_hashes}")
+        logger.debug("   build cases for '#{fam.desc}', #{setup_values.size} setups, #{input_hashes.size} input sets, build_family_cases")
 
-        input_sets.map do |input_set|
+        input_hashes.map do |input_hash|
           expectation = fam.use_legacy_snapshot ?
                           :use_legacy_snapshot :
                           Model::Outcome.new(output:    fam.expected_output,
                                               exception: fam.expected_exception)
 
           Thoreau::Model::TestCase.new family_desc:  "#{fam.kind.to_s.ljust(10).capitalize} #{fam.desc}",
-                                        input:        input_set,
+                                        input:        input_hash,
                                         action_block: @action_block,
                                         expectation:  expectation,
                                         asserts:      fam.asserts,
                                         negativo:     fam.failure_expected?
         end
 
+      end
+
+
+      def build_input_hashes input_specs, setup_values
+        sets = input_specs
+                 .map { |is| setup_values.merge(is) }
+                 .flat_map do |input_spec|
+          explode_input_specs(input_spec.keys, input_spec)
+        end
+        sets = [{}] if sets.size == 0
+        sets
       end
 
       # Expand any values that are enumerators (Thoreau::DSL::Expanded),
