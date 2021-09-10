@@ -1,7 +1,7 @@
 require 'active_support/core_ext/module/delegation'
 require_relative '../case/context_builder'
 require_relative './outcome'
-require_relative '../legacy_expected_outcomes'
+require_relative '../service/legacy_expected_outcomes'
 
 module Thoreau
   module Model

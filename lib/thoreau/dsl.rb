@@ -1,4 +1,4 @@
-require 'thoreau/logging'
+require 'thoreau/service/logging'
 require 'thoreau/model/test_suite'
 require 'thoreau/model/test_case'
 require 'thoreau/model/test_clan'
