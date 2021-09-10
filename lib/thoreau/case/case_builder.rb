@@ -38,26 +38,13 @@ module Thoreau
 
       private
 
-      def setup_key_to_inputs key
-        setup = @appendix.setups[key.to_s]
-        raise "Unrecognized setup context '#{key}'. Available: #{@appendix.setups.keys.to_sentence}" if setup.nil?
-        logger.debug("   setup_key_to_inputs `#{key}`: #{setup}")
-        return setup.values if setup.block.nil?
-
-        result = Class.new.new.instance_eval(&setup.block)
-        logger.error "Setup #{key} did not return a hash object" unless result.is_a?(Hash)
-        result
-      end
-
       def build_family_cases fam
         # We have "specs" for the inputs. These may be actual
         # values, or they may be enumerables that need to execute.
         # So we need to "explode" (or enumerate) the values,
         # generating a single test for each combination.
         #
-        setup_values = fam.setups
-                          .map { |key| setup_key_to_inputs key }
-                          .reduce(Hash.new) { |m, h| m.merge(h) }
+        setup_values = @appendix.setup_values fam.setups
         logger.debug("   -> setup_values = #{setup_values}")
         logger.debug("   -> fam.input_specs = #{fam.input_specs}")
         input_sets = fam.input_specs
