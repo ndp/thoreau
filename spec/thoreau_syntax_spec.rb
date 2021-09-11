@@ -27,7 +27,8 @@ suite "test output equality" do
   happy output: true # or not-- through will generate the best one it can
 
   # If procs are provided, they are evaluated before checking for equality.
-  happy "tests equivalence of proc result", equals: proc { nil.nil? }
+  happy "tests equivalence of proc result",
+        equals: proc { nil.nil? }
   happy "tests equivalence of proc result (negative case)",
         equals: proc { 3 == 4 },
         fails:  true
@@ -77,6 +78,15 @@ suite "parameter" do
 
   happy "input parameter passes to test block", input: { a: 5 }, output: 5
   happy "'input' can have an 's' for readability", inputs: { a: 5, b: 9 }, output: 5
+
+  happy 'equals proc receives input parameters',
+        input:  { a: 3.14 },
+        equals: proc { a }
+
+  happy 'assert proc receives input parameters',
+        input:  { a: 3.14 },
+        assert: proc { a }
+
 end
 
 # Of course multiple parameters are fine.
@@ -107,6 +117,14 @@ suite "shared setup blocks" do
   happy 'can have multiple setups', setups: ['a7', 'b3'], output: 10
   happy 'last setup wins', setups: ['a7', 'a5', 'b3'], output: 8
   happy 'input beats all setups', input: { a: 100 }, setups: ['a7', 'a5', 'b3'], output: 103
+
+  happy 'equals proc receives setup parameters',
+        setups: "a5",
+        equals: proc { a }
+
+  happy 'assert proc receives setup parameters',
+        setups: "a5",
+        assert: proc { a == 5 }
 
   appendix do
     setup "a5", { a: 5 }

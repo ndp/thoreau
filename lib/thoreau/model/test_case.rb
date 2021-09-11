@@ -39,7 +39,7 @@ module Thoreau
         "#{@family_desc} #{(@input == {} ? nil : @input.sort.to_h) || @expectation.exception || "(no args)"}"
       end
 
-      def problem
+      def result_analysis
 
         run unless @ran
 
@@ -76,8 +76,20 @@ module Thoreau
         end
       end
 
+      def problem
+        if failure_expected?
+          if result_analysis.nil?
+            "Failure expected but didn't. Is this implemented already?"
+          else
+            nil
+          end
+        else
+          result_analysis
+        end
+      end
+
       def ok?
-        failure_expected? ^ !!problem.nil?
+        problem.nil?
       end
 
       def failed?

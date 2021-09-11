@@ -1,3 +1,4 @@
+require_relative '../thoreau'
 require_relative './dsl'
 
 at_exit do
