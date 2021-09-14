@@ -47,7 +47,10 @@ module Thoreau
 
           logger.debug " -> Expected Exception #{@expectation.exception} @actual.exception:#{@actual.exception}"
 
-          if @actual.exception.to_s == @expectation.exception.to_s
+          if @expectation.exception.is_a?(Class) &&
+            @actual.exception.class == @expectation.exception
+            nil
+          elsif @actual.exception.to_s == @expectation.exception.to_s
             nil
           elsif @actual.exception.nil?
             "Expected exception, but none raised"
@@ -61,7 +64,12 @@ module Thoreau
 
           logger.debug " -> Assert Proc result=#{@assert_result}"
 
-          @assert_result ? nil : "Assertion failed. (got #{@assert_result})"
+          if @actual.exception.nil?
+            @assert_result ? nil : "Assertion failed. (got '#{@assert_result}', result='#{@actual.output}')"
+          else
+            "Expected assertion, but raised exception '#{@actual.exception}'"
+          end
+
         else
 
           logger.debug " -> Result expected: result=#{@actual.output} expected_output: #{@expectation.output} @actual.exception:#{@actual.exception}"

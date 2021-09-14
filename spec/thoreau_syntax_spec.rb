@@ -62,10 +62,18 @@ end
 
 # Expectations can be written around exceptions as well.
 suite "exceptions" do
-  subject { raise "not on my watch" }
+
+  class MyErr < RuntimeError; end
+
+  subject { raise MyErr.new("not on my watch") }
 
   sad raises: "not on my watch"
+  sad raises: MyErr
   sad raises: "not on my iWatch", fails: true
+  sad 'assert failure shows exception (need better test)',
+      expect: "a result",
+      assert: proc { true },
+      fails:  true
   sad "wrong exception type", raises: Exception, fails: true
 end
 
@@ -137,7 +145,7 @@ end
 # from a function, but you may want to do a more complex test.
 # Using an "asserts" property allows you to do any sort of
 # comparison, as long as the function returns true or false.
-suite "expectation blocks" do
+suite "asserts blocks" do
   subject { 3 }
 
   happy "runs assertion block", asserts: proc { |result| result == 3 }
@@ -150,6 +158,23 @@ suite "expectation blocks" do
         asserts: proc { |_| false },
         fails:   true
 
+  happy "block has access to setup values",
+        setup:   'the number six',
+        asserts: proc { |r| r == six / 2 }
+
+  happy "block has access to setup values",
+        setup:  'the number six',
+        equals: proc { |_| six / 2 }
+
+  happy "runs both equals and asserts",
+        setup:   'the number six',
+        asserts: proc { |r| r == six / 2 },
+        equals:  proc { |_| six / 3 },
+        fails:   true
+
+  appendix do
+    setup 'the number six', { six: 6 }
+  end
 end
 
 # On some occasions you will want to check multiple values
