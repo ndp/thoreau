@@ -1,3 +1,4 @@
+require 'active_support'
 require 'active_support/core_ext/module/delegation'
 require_relative './appendix'
 require_relative '../case/multi_clan_case_builder'

@@ -1,3 +1,4 @@
+require 'active_support'
 require 'active_support/core_ext/module/delegation'
 require_relative '../case/context_builder'
 require_relative './outcome'

@@ -1,6 +1,7 @@
 require_relative '../../model/test_family'
 require_relative '../expanded'
 require_relative '../../service/util'
+require 'active_support'
 require 'active_support/core_ext/array/conversions'
 
 module Thoreau

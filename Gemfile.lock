@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    thoreau (0.3.0)
+    thoreau (0.3.1)
       activesupport (>= 5)
       rainbow
 
