@@ -16,7 +16,7 @@ module Thoreau
         expected_output:    %i[equals equal expected expect expects output],
         failure_expected:   %i[fails pending],
         input_specs:        %i[input inputs],
-        setups:             %i[setup setups]
+        setups:             %i[setup setups assemble]
       }
       ALL_PROPS           = PROPS.values.flatten.map(&:to_s)
       PROPS_SPELL_CHECKER = DidYouMean::SpellChecker.new(dictionary: ALL_PROPS)
@@ -30,6 +30,7 @@ module Thoreau
           @test_clan_model.action_block = block
         end
 
+        alias act action
         alias testing action
         alias subject action
 

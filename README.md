@@ -1,9 +1,25 @@
 
 # Thoreau
 
-A more thoughtful test framework
+*A more thoughtful test framework*
+
+**Write concise specs that focus on the intent of inputs and outputs.**
 
 ![Example code, annotated](docs/thoreau-sample-annotated.png "Example test case using Thoreau")
+
+
+## What it is
+
+Thoreau is a new test framework that dictates a strict structure. Each test suite consists of:
+
+* a subject: the code under test
+* test cases: concise lists of inputs and expect outputs
+* appendix: setup blocks and other details that tend to obscure test code.
+
+If you like the AAA acronym (assemble, act, assert), this lines up quite easily> In fact, those keywords can be used.
+
+If you like Gherkin style tests, setup/input/expect instantly translates to Given/when/then.
+
 
 ## Installation
 
@@ -32,14 +48,6 @@ ERROR: ❓  Spec       Addition regression (no args)
 ERROR:     Expected '3', but got '2'
 INFO:  🛑  1 problem(s) detected.  [1 of 2 OK.]
 ```
-## How it works
-
-Thoreau dictates a stricter structure than most testing languages.  All tests should be wrapped in a  `test_suite` block. A test suite consists of:
-
-* `subject`
-* test cases
-* `appendix`
-
 ### Subject
 
 ```
@@ -47,7 +55,7 @@ subject { code_under_test() }
 ```
 Thoreau requires the **subject** of the test to be very clear. It's written in the first block of the suite and always required. It's simple: the keyword `subject` and then a block that is evaluated. 
 
-Unlike other frameworks, the subject _cannot_ overridden, in some nested fashion, although it can (and is) parameterized. You *can* do this with other frameworks, but is optional and inconsistent. 
+Unlike other frameworks, the subject _cannot_ overridden, in some nested fashion, although it can (and is) parameterized. You *can* follow the same pattern with other frameworks, but it is hard to enforce such rules with a large team and codebase. 
 
 ### Test Case
 
@@ -59,7 +67,7 @@ Each test case consists of:
 * a name
 * `inputs`, which provide a way to parameterize the test. This is an hash and all its properties will be exposed to `subject` block. It can also be a block that returns a hash. If it's not needed, it can be omitted.
 * `equals` is a value (or block that returns a value) that must match the return value of `subject`. If this is a block, it is provided the same context as the `subject` block (all the inputs). Every test should have an `equals` (unless it has an assert).
-* If `equals` is insufficient, `assert` may be used. It is a block that returns `true` for success, or false for an error detected
+* If `equals` is insufficient, `assert` may be used. It is a block that returns `true` for success, or `false` for an error detected
 * Finally, if the test is going to raise an exception, specify it with a `raises`.
 * `setups` are a way to share setup blocks between test cases. This is a name of one or more setups found in the appendix. 
 
@@ -78,7 +86,7 @@ Setup blocks and input blocks are run in the same context, but setup blocks are 
 
 ### Legacy Tests
 
-TBD
+Instead of specifying
 
 ### Expanded Setup Values
 
@@ -105,6 +113,18 @@ Thoreau does support one alternate structure, where you need different subjects:
 * appendix
 
 **Flexibility.** Name your test based on the type of test, eg. happy, sad, spec, edge, edges, boundary, corner, gigo, etc.
+
+## FAQs
+
+* How would I try this tool out without investing a ton of time?
+  - At this time, I would only recommend Thoreau for a new test suite. Try it out, and let me know how it goes.
+  - There is no migration path from existing tests to thoreau tests, and it doesn't integrate with existing test runners. This may change in the future.
+* How do I know that I wont end up in the same situation of gnarled test suites?
+  - Thoreau is much more constrained than other spec languages. You can abuse any language, but it will be hard to create the same spaghetti with a language that starts with current best practices:
+    - explicit setup code. There are no automatically executied or nested context blocks
+    - each test must test just one thing, and make one assertion
+3. It seems like you're primarily targeting unit tests?
+- Yes, at this point Thoreau is targetting short-running tests with single assertions.
 
 ## Motivation
 
@@ -139,6 +159,12 @@ Tests suites live with and evolve with the production code, but most test tools 
 This project is a place to discover and try out new techniques. It's a "proof of concept". Although I'll do what I can
 to make it solid, right now it's flexible so the ideas can be evaluated easily. The DSL can certainly evolve, and in
 fact, that's really the point.
+
+## Partial Bibliography / References
+
+* [Why Good Developers Write Bad Tests](https://mtlynch.io/good-developers-bad-tests/)
+* [Javascript Testing Best Practices](https://github.com/goldbergyoni/javascript-testing-best-practices) -- ideas on writing good tests
+* [What are BASIC Principals](https://yonigoldberg.medium.com/fighting-javascript-tests-complexity-with-the-basic-principles-87b7622eac9a) -- more ideas on writing good tests
 
 ## Development
 
